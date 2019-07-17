@@ -4,6 +4,7 @@
   "description": "Automation framework for the spark browser",
   "main": "index.js",
   "scripts": {
+    "build": "cross-env NODE_ENV=production babel src -d dist --copy-files",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -12,6 +13,13 @@
     "@babel/cli": "^7.5.0",
     "@babel/core": "^7.5.4",
     "@babel/preset-env": "^7.5.4",
-    "prettier": "^1.18.2"
+    "@babel/preset-typescript": "^7.3.3",
+    "cross-env": "^5.2.0",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.1.0"
   }
 }

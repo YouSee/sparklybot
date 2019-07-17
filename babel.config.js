@@ -14,6 +14,7 @@ module.exports = api => {
           },
         },
       ],
+      '@babel/typescript'
     ],
   }
 }
