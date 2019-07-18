@@ -10,7 +10,6 @@
 
 // Global
 let GlobalScene = null
-const applicationUrl = '$applicationurl$' // This value to be replaced by express server
 const websocketUrl = '$websocketurl$' // This value to be replaced by express server
 const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
@@ -45,33 +44,47 @@ const uploadImage = (image, http, payload) => {
   })
 }
 
-const refreshApplication = (scene) => {
+const refreshApplication = (scene, payload) => {
+  console.log('refresh action!')
   if (!GlobalScene) {
     GlobalScene = scene.create({
       t: 'scene',
       parent: scene.root,
-      url: applicationUrl,
+      url: payload,
     })
+    GlobalScene.focus = true
     return
   }
   GlobalScene.dispose()
   GlobalScene = scene.create({
     t: 'scene',
     parent: scene.root,
-    url: applicationUrl,
+    url: payload,
   })
 }
 
 const closeBrowser = () => global.progress.exit(0)
 
 const handleServerResponse = (scene, data, http) => {
-  const { action, payload } = data
-  if (!action) return
+  const { action, payload } = JSON.parse(data)
+  console.log(`Spark received action: ${action}`)
+  console.log(`Payload is: ${payload}`)
   switch (action) {
-    case 0: return refreshApplication(scene)
-    case 1: return closeBrowser()
-    case 2: return uploadImage(scene.screenshot('image/png;base64'), http, payload)
-    default: return
+    case 1: {
+      refreshApplication(scene, payload)
+      return
+    }
+    case 2: {
+      closeBrowser()
+      return
+    }
+    case 3: {
+      uploadImage(scene.screenshot('image/png;base64'), http, payload)
+      return
+    }
+    default:
+      console.log('Action miss!')
+      return
   }
 }
 

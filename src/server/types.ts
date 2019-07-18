@@ -1,5 +1,4 @@
 export interface TestOptions {
-  sparkApplicationPath: string,
   testRegexPath: string,
   port?: number,
   wsPort?: number,
@@ -7,11 +6,11 @@ export interface TestOptions {
 }
 
 export enum SparkBrowserActions {
-  REFRESH_BROWSER = 0,
-  CLOSE_BROWSER = 1,
-  TAKE_SCREENSHOT = 2,
-  PRINT_SCENE_STRUCTURE = 3,
-  KEYSTROKE = 4,
+  REFRESH_BROWSER = 1,
+  CLOSE_BROWSER = 2,
+  TAKE_SCREENSHOT = 3,
+  PRINT_SCENE_STRUCTURE = 4,
+  KEYSTROKE = 5,
 }
 
 export interface MessagePayload {
