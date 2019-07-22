@@ -65,7 +65,7 @@ const refreshApplication = (scene, payload) => {
   })
 }
 
-const closeBrowser = () => global.progress.exit(0)
+const closeBrowser = () => global.process.exit(1)
 
 const sendActionFullfilled = ticketId => websocket.send(JSON.stringify({ ticketId }))
 
@@ -84,8 +84,8 @@ const handleServerResponse = (scene, data, http) => {
       return
     }
     case 2: {
-      closeBrowser()
       sendActionFullfilled(ticketId)
+      closeBrowser()
       return
     }
     case 3: {
@@ -110,7 +110,16 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
       websocket = new Websocket(websocketUrl)
 
       // Handle websocket messages from server
-      websocket.on('message', data => handleServerResponse(scene, data, http))
+      websocket.on('message', data => {
+        try {
+          handleServerResponse(scene, data, http)
+        } catch (error) {
+          websocket.send(JSON.stringify({
+            uncaughtException: true,
+            err: 'Uncaught exception from spark browser client',
+          }))
+        }
+      })
 
       websocket.on('error', () => console.log('Connection error'))
     }

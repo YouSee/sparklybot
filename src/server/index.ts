@@ -59,10 +59,11 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     ws.on('message', (message: string) => {
       if (message) {
         const data = JSON.parse(message)
-        if (!data || !data.ticketId) throw Error('Missing ticketId from client')
+        if (data && data.uncaughtException) throw new Error(data.err)
+        if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
         // Resolve message queue
         const callbackQueueEvent = websocketMessageQueue.get(data.ticketId)
-        if (!callbackQueueEvent) throw Error('Unknown message received from client')
+        if (!callbackQueueEvent) throw new Error('Unknown message received from client')
         callbackQueueEvent.resolve(data)
       }
     })
@@ -114,6 +115,10 @@ export const refreshSparkBrowser = (sparkApplicationPath: string) => {
 export const takeScreenshot = (path:string) => sendInfoToClients({
   action: SparkBrowserActions.TAKE_SCREENSHOT,
   payload: path,
+})
+
+export const closeBrowser = () => sendInfoToClients({
+  action: SparkBrowserActions.CLOSE_BROWSER,
 })
 
 export const getSceneTreeStructure = (ticketId:string) => sendInfoToClients({
