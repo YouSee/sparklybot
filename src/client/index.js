@@ -13,8 +13,9 @@ let GlobalScene = null
 const websocketUrl = '$websocketurl$' // This value to be replaced by express server
 const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
+let websocket = null
 
-const uploadImage = (image, http, payload) => {
+const uploadImage = (image, http, payload, ticketId) => {
   const data = JSON.stringify({
     pngImage: image,
     imagePathName: payload,
@@ -31,10 +32,11 @@ const uploadImage = (image, http, payload) => {
       }
     }, function (res) {
       if (res.statusCode != 200) {
-          console.log('upload failed')
-        return;
+        console.log('upload failed')
+        reject('upload failed')
+        return
       }
-      console.log('upload success')
+      resolve()
     })
     req.on('error', function(e) {
       reject("ERROR "+e.message)
@@ -53,7 +55,7 @@ const refreshApplication = (scene, payload) => {
       url: payload,
     })
     GlobalScene.focus = true
-    return
+    return 
   }
   GlobalScene.dispose()
   GlobalScene = scene.create({
@@ -65,34 +67,43 @@ const refreshApplication = (scene, payload) => {
 
 const closeBrowser = () => global.progress.exit(0)
 
+const sendActionFullfilled = ticketId => websocket.send(JSON.stringify({ ticketId }))
+
 const handleServerResponse = (scene, data, http) => {
-  const { action, payload } = JSON.parse(data)
+  const { action, payload, ticketId } = JSON.parse(data)
   console.log(`Spark received action: ${action}`)
   console.log(`Payload is: ${payload}`)
+  if (!ticketId || !action) {
+    console.log('Missing information, cant handle request')
+    return
+  }
   switch (action) {
     case 1: {
       refreshApplication(scene, payload)
+      GlobalScene.ready.then(() => sendActionFullfilled(ticketId))
       return
     }
     case 2: {
       closeBrowser()
+      sendActionFullfilled(ticketId)
       return
     }
     case 3: {
-      uploadImage(scene.screenshot('image/png;base64'), http, payload)
+      uploadImage(scene.screenshot('image/png;base64'), http, payload, ticketId)
+        .then(() => sendActionFullfilled(ticketId))
       return
     }
-    default:
+    default: {
       console.log('Action miss!')
+      sendActionFullfilled(ticketId)
       return
+    }
   }
 }
 
 px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-line no-undef
   .then(imports => {
     const { ws: Websocket, scene, http } = imports
-
-    let websocket = null
 
     // Websocket initializer
     const startWebSocket = () => {

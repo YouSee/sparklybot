@@ -16,6 +16,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@types/express": "^4.17.0",
     "@types/node": "^12.6.6",
+    "@types/uid2": "0.0.0",
     "@types/ws": "^6.0.1",
     "cross-env": "^5.2.0",
     "prettier": "^1.18.2",
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "express": "^4.17.1",
+    "uid2": "0.0.3",
     "ws": "^7.1.0"
   }
 }

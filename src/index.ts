@@ -9,5 +9,9 @@ initializeSparkTestBrowser({
 })
 
 // Send test event
-setTimeout(() => refreshSparkBrowser(path.resolve(__dirname, './test/sparkApplication/index.js')), 5000)
-setTimeout(() => takeScreenshot(path.resolve('./myimage.png')), 6000)
+setTimeout(async () => {
+  console.log('Call refresh')
+  await refreshSparkBrowser(path.resolve(__dirname, './test/sparkApplication/index.js'))
+  console.log('After refresh')
+  await takeScreenshot(path.resolve('./myimage.png'))
+}, 7000)
