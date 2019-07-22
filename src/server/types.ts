@@ -1,5 +1,7 @@
 export interface TestOptions {
   testRegexPath: string,
+  isRemoteTesting?: boolean,
+  sparkBrowserPath?: string,
   port?: number,
   wsPort?: number,
   hostname?: string,

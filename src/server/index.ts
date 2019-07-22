@@ -1,17 +1,21 @@
 import path from 'path'
 import fs from 'fs'
+import { exec } from 'child_process'
 import express from 'express'
 import WebSocket from 'ws'
 import uid from 'uid2'
+import kill from 'tree-kill'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
 
 let websocketServer:WebSocket.Server = null
+let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp = null
 let port:number = null
 let hostname:string = null
 let websocketMessageQueue = new Map()
 let defaultTimeoutSeconds = 10
+let processId:number = null
 
 export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
   // Initialize express server and websocket server
@@ -51,7 +55,13 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
       res.send(client)
     })
 
-    expressApp.listen(port, () => console.log(`Express server listening on port ${port}`))
+    expressApp.listen(port, () => {
+      console.log(`Express server listening on port ${port}`)
+      // Initiate spark browser if not using remote testing
+      if (!testOptions.isRemoteTesting) {
+        exec(`${defaultSparkApplicationPath} http://localhost:${port}/automation.js`, err => { if (err) throw new Error('Failed to load spark browser')})
+      }
+    })
 
     // Setup ws server
     websocketServer = new WebSocket.Server({ port: wsPort })
@@ -60,7 +70,12 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
       ws.on('message', (message: string) => {
         if (message) {
           const data = JSON.parse(message)
-          if (data && data.connected) return resolve(data.processId)
+          if (data && data.connected && data.processId) {
+            // Set current process Id
+            processId = data.processId
+            console.log(`got processId: ${processId}`)
+            return resolve(data.processId)
+          }
           if (data && data.uncaughtException) throw new Error(data.err)
           if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
           // Resolve message queue
@@ -120,9 +135,9 @@ export const takeScreenshot = (path:string) => sendInfoToClients({
   payload: path,
 })
 
-export const closeBrowser = () => sendInfoToClients({
-  action: SparkBrowserActions.CLOSE_BROWSER,
-})
+export const closeBrowser = () => {
+  if (processId) kill(processId)
+}
 
 export const getSceneTreeStructure = () => sendInfoToClients({
   action: SparkBrowserActions.PRINT_SCENE_STRUCTURE,

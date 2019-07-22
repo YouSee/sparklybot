@@ -16,7 +16,7 @@ const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
 
 const websocketSendData = data => websocket !== null && websocket.send(JSON.stringify(Object.assign({}, {
-  processId: global.process.uid,
+  processId: global.process.pid,
 }, data)))
 
 const uploadImage = (image, http, payload, ticketId) => {
