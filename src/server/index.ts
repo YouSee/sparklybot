@@ -15,57 +15,60 @@ let defaultTimeoutSeconds = 10
 
 export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
   // Initialize express server and websocket server
-  expressApp = express()
-  hostname = testOptions.hostname || 'localhost'
-  port = testOptions.port || 3000
-  const wsPort = testOptions.wsPort || 3333
+  return new Promise((resolve, reject) => {
+    expressApp = express()
+    hostname = testOptions.hostname || 'localhost'
+    port = testOptions.port || 3000
+    const wsPort = testOptions.wsPort || 3333
 
-  if (!testOptions.testRegexPath) throw new Error('No test regex provided')
+    if (!testOptions.testRegexPath) reject('No test regex provided')
 
-  // Json support
-  expressApp.use(express.json())
+    // Json support
+    expressApp.use(express.json())
 
-  // Serve public folder as static
-  expressApp.use(express.static(path.resolve(__dirname, '../public')))
+    // Serve public folder as static
+    expressApp.use(express.static(path.resolve(__dirname, '../public')))
 
-  // Screenshot handling => /upload
-  expressApp.post('/upload', (req, res) => {
-    const { pngImage, imagePathName } = req.body
-    const imageBuffer = decodeBase64Image(pngImage)
-    console.log(`Image path name: ${imagePathName}`)
-    fs.writeFile(imagePathName, imageBuffer.data, (err) => {
-      if (err) res.status(400).send('Error saving image')
-      res.status(200).send()
-    });
-  })
+    // Screenshot handling => /upload
+    expressApp.post('/upload', (req, res) => {
+      const { pngImage, imagePathName } = req.body
+      const imageBuffer = decodeBase64Image(pngImage)
+      console.log(`Image path name: ${imagePathName}`)
+      fs.writeFile(imagePathName, imageBuffer.data, (err) => {
+        if (err) res.status(400).send('Error saving image')
+        res.status(200).send()
+      });
+    })
 
-  // Serve spark application
-  expressApp.use('*', (req, res) => {
-    res.setHeader('Content-Type', 'application/javascript')
-    const client = fs
-      .readFileSync(path.join(__dirname, '../client/index.js'), 'utf8')
-      .replace('$websocketurl$', `ws://${hostname}:${wsPort}`)
-      .replace('$hostname$', `${hostname}`)
-      .replace('$portnumber$', `${port}`)
-    res.send(client)
-  })
+    // Serve spark application
+    expressApp.use('*', (req, res) => {
+      res.setHeader('Content-Type', 'application/javascript')
+      const client = fs
+        .readFileSync(path.join(__dirname, '../client/index.js'), 'utf8')
+        .replace('$websocketurl$', `ws://${hostname}:${wsPort}`)
+        .replace('$hostname$', `${hostname}`)
+        .replace('$portnumber$', `${port}`)
+      res.send(client)
+    })
 
-  expressApp.listen(port, () => console.log(`Express server listening on port ${port}`))
+    expressApp.listen(port, () => console.log(`Express server listening on port ${port}`))
 
-  // Setup ws server
-  websocketServer = new WebSocket.Server({ port: wsPort })
+    // Setup ws server
+    websocketServer = new WebSocket.Server({ port: wsPort })
 
-  websocketServer.on('connection', (ws) => {
-    ws.on('message', (message: string) => {
-      if (message) {
-        const data = JSON.parse(message)
-        if (data && data.uncaughtException) throw new Error(data.err)
-        if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
-        // Resolve message queue
-        const callbackQueueEvent = websocketMessageQueue.get(data.ticketId)
-        if (!callbackQueueEvent) throw new Error('Unknown message received from client')
-        callbackQueueEvent.resolve(data)
-      }
+    websocketServer.on('connection', (ws) => {
+      ws.on('message', (message: string) => {
+        if (message) {
+          const data = JSON.parse(message)
+          if (data && data.connected) return resolve(data.processId)
+          if (data && data.uncaughtException) throw new Error(data.err)
+          if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
+          // Resolve message queue
+          const callbackQueueEvent = websocketMessageQueue.get(data.ticketId)
+          if (!callbackQueueEvent) throw new Error('Unknown message received from client')
+          callbackQueueEvent.resolve(data)
+        }
+      })
     })
   })
 }

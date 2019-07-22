@@ -15,6 +15,10 @@ const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
 
+const websocketSendData = data => websocket !== null && websocket.send(JSON.stringify(Object.assign({}, {
+  processId: global.process.uid,
+}, data)))
+
 const uploadImage = (image, http, payload, ticketId) => {
   const data = JSON.stringify({
     pngImage: image,
@@ -67,7 +71,7 @@ const refreshApplication = (scene, payload) => {
 
 const closeBrowser = () => global.process.exit(1)
 
-const sendActionFullfilled = ticketId => websocket.send(JSON.stringify({ ticketId }))
+const sendActionFullfilled = ticketId => websocketSendData({ ticketId })
 
 const handleServerResponse = (scene, data, http) => {
   const { action, payload, ticketId } = JSON.parse(data)
@@ -109,15 +113,21 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
     const startWebSocket = () => {
       websocket = new Websocket(websocketUrl)
 
+      websocket.on('open', () => {
+        websocketSendData({
+          connected: true,
+        })
+      })
+
       // Handle websocket messages from server
       websocket.on('message', data => {
         try {
           handleServerResponse(scene, data, http)
         } catch (error) {
-          websocket.send(JSON.stringify({
+          websocketSendData({
             uncaughtException: true,
             err: 'Uncaught exception from spark browser client',
-          }))
+          })
         }
       })
 
