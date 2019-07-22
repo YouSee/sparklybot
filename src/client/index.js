@@ -15,6 +15,34 @@ const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
 
+Object.stringify = function(value, space) {
+  var cache = [];
+
+  var output = JSON.stringify(value, function (key, value) {
+
+      // filters parent on scene object to prevent circular structure
+      if(key && key.length>0 && key == "parent") {
+          return;
+      }
+
+      if (typeof value === 'object' && value !== null) {
+          if (cache.indexOf(value) !== -1) {
+              // Circular reference found, discard key
+              return;
+          }
+          // Store value in our collection
+          cache.push(value);
+      }
+
+
+      return value;
+  }, space)
+
+  cache = null; // Enable garbage collection
+
+  return output;
+}
+
 const websocketSendData = data => websocket !== null && websocket.send(JSON.stringify(Object.assign({}, {
   processId: global.process.pid,
 }, data)))
@@ -97,6 +125,14 @@ const handleServerResponse = (scene, data, http) => {
         .then(() => sendActionFullfilled(ticketId))
       return
     }
+    case 4: {
+      // Print scene object
+      websocketSendData({
+        ticketId,
+        sceneData: Object.stringify(scene.root.children, null, 4),
+      })
+      return
+    }
     default: {
       console.log('Action miss!')
       sendActionFullfilled(ticketId)
@@ -124,9 +160,10 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
         try {
           handleServerResponse(scene, data, http)
         } catch (error) {
+          console.log(error)
           websocketSendData({
             uncaughtException: true,
-            err: 'Uncaught exception from spark browser client',
+            err: `SparkBrowserError: ${error.message}`,
           })
         }
       })

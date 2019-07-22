@@ -76,7 +76,10 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
             console.log(`got processId: ${processId}`)
             return resolve(data.processId)
           }
-          if (data && data.uncaughtException) throw new Error(data.err)
+          if (data && data.uncaughtException) {
+            if (processId) kill(processId)
+            throw new Error(data.err)
+          }
           if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
           // Resolve message queue
           const callbackQueueEvent = websocketMessageQueue.get(data.ticketId)
