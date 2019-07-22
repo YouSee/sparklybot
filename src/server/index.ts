@@ -121,6 +121,6 @@ export const closeBrowser = () => sendInfoToClients({
   action: SparkBrowserActions.CLOSE_BROWSER,
 })
 
-export const getSceneTreeStructure = (ticketId:string) => sendInfoToClients({
+export const getSceneTreeStructure = () => sendInfoToClients({
   action: SparkBrowserActions.PRINT_SCENE_STRUCTURE,
 })
