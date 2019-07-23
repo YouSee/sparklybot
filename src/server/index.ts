@@ -145,3 +145,7 @@ export const closeBrowser = () => {
 export const getSceneTreeStructure = () => sendInfoToClients({
   action: SparkBrowserActions.PRINT_SCENE_STRUCTURE,
 })
+
+export const getMemoryUsage = () => sendInfoToClients({
+  action: SparkBrowserActions.GET_MEMORY_USAGE,
+})

@@ -13,6 +13,7 @@ export enum SparkBrowserActions {
   TAKE_SCREENSHOT = 3,
   PRINT_SCENE_STRUCTURE = 4,
   KEYSTROKE = 5,
+  GET_MEMORY_USAGE = 6,
 }
 
 export interface MessagePayload {

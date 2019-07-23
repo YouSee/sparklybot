@@ -133,6 +133,21 @@ const handleServerResponse = (scene, data, http) => {
       })
       return
     }
+    case 5: {
+      // TODO: implement keystroke
+      return
+    }
+    case 6: {
+      // Get memory usage
+      const texture = scene !== null ? scene.textureMemoryUsage() : null
+      const mem = global.process.memoryUsage()
+      websocketSendData({
+        ticketId,
+        texture,
+        mem,
+      })
+      return
+    }
     default: {
       console.log('Action miss!')
       sendActionFullfilled(ticketId)
