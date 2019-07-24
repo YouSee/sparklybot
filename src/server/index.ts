@@ -47,10 +47,11 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     // Serve spark application
     expressApp.use('*', (req, res) => {
       res.setHeader('Content-Type', 'application/javascript')
+      const customHostname = hostname === 'localhost' ? req.hostname : hostname
       const client = fs
         .readFileSync(path.join(__dirname, '../client/index.js'), 'utf8')
-        .replace('$websocketurl$', `ws://${hostname}:${wsPort}`)
-        .replace('$hostname$', `${hostname}`)
+        .replace('$websocketurl$', `ws://${customHostname}:${wsPort}`)
+        .replace('$hostname$', `${customHostname}`)
         .replace('$portnumber$', `${port}`)
       res.send(client)
     })

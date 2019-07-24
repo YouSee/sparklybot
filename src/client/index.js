@@ -14,6 +14,7 @@ const websocketUrl = '$websocketurl$' // This value to be replaced by express se
 const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
+let scenes = []
 
 Object.stringify = function(value, space) {
   var cache = [];
@@ -84,6 +85,8 @@ const refreshApplication = (scene, payload) => {
     GlobalScene = scene.create({
       t: 'scene',
       parent: scene.root,
+      h: 720,
+      w: 1280,
       url: payload,
     })
     GlobalScene.focus = true
@@ -93,6 +96,8 @@ const refreshApplication = (scene, payload) => {
   GlobalScene = scene.create({
     t: 'scene',
     parent: scene.root,
+    h: 720,
+    w: 1280,
     url: payload,
   })
 }
@@ -129,7 +134,7 @@ const handleServerResponse = (scene, data, http) => {
       // Print scene object
       websocketSendData({
         ticketId,
-        sceneData: Object.stringify(scene.root.children, null, 4),
+        sceneData: scenes.length ? scenes.map(scene => Object.stringify(scene.root, null, 20)) : null,
       })
       return
     }
@@ -159,6 +164,16 @@ const handleServerResponse = (scene, data, http) => {
 px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-line no-undef
   .then(imports => {
     const { ws: Websocket, scene, http } = imports
+
+    scene.addServiceProvider((serviceName) => {                   
+      if (serviceName === ".sparklybot")
+      {
+        return {
+          registerScene:  (scene) => scenes.push(scene)
+        }
+      }
+      return "allow"      
+    })
 
     // Websocket initializer
     const startWebSocket = () => {
