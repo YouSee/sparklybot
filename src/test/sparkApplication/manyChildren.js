@@ -24,13 +24,13 @@ px.import('px:scene.1.js').then(scene => {
 
   // Add lots of children
   let offsetX = 1
-  Array.apply(null, Array(5000)).map((item, index) => scene.create({
+  Array.apply(null, Array(200)).map((item, index) => scene.create({
     t: 'text',
     id: `textChild-${index}`,
     x: offsetX * index,
     y: 300,
     parent: newNode,
-    text: 'Hello World!',
+    text: 'We are many!',
     textColor: 'yellow',
     pixelSize: 40,
   }))

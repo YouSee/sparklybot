@@ -4,9 +4,8 @@ import {
   refreshSparkBrowser,
   takeScreenshot,
   closeBrowser,
-  getSceneTreeStructure,
-  getMemoryUsage,
   findElementWithPropertyValue,
+  findElementsWithPropertyValue
 } from './server'
 
 // Send test event
@@ -16,8 +15,9 @@ const testSetup = async () => {
   })
   await refreshSparkBrowser(path.resolve(__dirname, './test/sparkApplication/manyChildren.js'))
   await takeScreenshot(path.resolve(__dirname, './myimage.png'))
-  const element = await findElementWithPropertyValue(10, 'text', 'Hello World!')
+  const element = await findElementsWithPropertyValue('text', 'We are many!')
   console.log(element)
+  console.log(element.length)
   await closeBrowser()
   console.log('actions done')
 }

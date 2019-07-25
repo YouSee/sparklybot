@@ -7,7 +7,7 @@ import uid from 'uid2'
 import kill from 'tree-kill'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
-import { deepSearch, deepSearchMultiple } from './utils/search'
+import { deepSearchMultiple } from './utils/search'
 
 let websocketServer:WebSocket.Server = null
 let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
@@ -152,40 +152,27 @@ export const getMemoryUsage = () => sendInfoToClients({
   action: SparkBrowserActions.GET_MEMORY_USAGE,
 })
 
-export const findElementsWithPropertyValue = async (timeoutSeconds: number, property: string, value: string) => {
-  return new Promise(async (resolve, reject) => {
+const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: number, property: string, value: string): any => {
+  return new Promise(async (resolve) => {
     let shouldContinue = true
     const timeout = setTimeout(() => { shouldContinue = false }, timeoutSeconds * 1000)
     while (shouldContinue) {
-      const sceneTreeStucture = await getSceneTreeStructure()
+      const sceneTreeStucture:any = await getSceneTreeStructure()
       // Find element with property and value
-      const scenesJson = sceneTreeStucture.sceneData.map(scene => JSON.parse(scene))
-      const result = deepSearchMultiple(scenesJson, property, (k, v) => v === value)
-      if (result && result.length) {
-        clearTimeout(timeout)
-        resolve(result)
-        break
-      }
-    }
-    resolve(null)
-  })
-}
-
-export const findFirstElementWithPropertyValue = async (timeoutSeconds: number, property: string, value: string) => {
-  return new Promise(async (resolve, reject) => {
-    let shouldContinue = true
-    const timeout = setTimeout(() => { shouldContinue = false }, timeoutSeconds * 1000)
-    while (shouldContinue) {
-      const sceneTreeStucture = await getSceneTreeStructure()
-      // Find element with property and value
-      const scenesJson = sceneTreeStucture.sceneData.map(scene => JSON.parse(scene))
-      const result = deepSearch(scenesJson, property, (k, v) => v === value)
+      const scenesJson = sceneTreeStucture.sceneData.map((scene:any) => JSON.parse(scene))
+      const result = deepSearchMultiple(multiple, scenesJson, property, (propertyValue) => propertyValue === value)
       if (result) {
         clearTimeout(timeout)
         resolve(result)
         break
       }
     }
-    resolve(null)
+    resolve(multiple ? [] : null)
   })
 }
+
+export const findElementsWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): Array<any> =>
+  searchSceneTreeWithPropertyValue(true, timeoutSeconds, property, value)
+
+export const findElementWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): any =>
+  searchSceneTreeWithPropertyValue(false, timeoutSeconds, property, value)
