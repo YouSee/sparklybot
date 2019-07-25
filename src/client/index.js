@@ -134,7 +134,7 @@ const handleServerResponse = (scene, data, http) => {
       // Print scene object
       websocketSendData({
         ticketId,
-        sceneData: scenes.length ? scenes.map(scene => Object.stringify(scene.root, null, 20)) : null,
+        sceneData: scenes.length ? scenes.map(scene => Object.stringify(scene.root, null)) : [],
       })
       return
     }

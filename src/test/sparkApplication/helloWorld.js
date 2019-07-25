@@ -1,3 +1,4 @@
+// Hello World application
 px.import('px:scene.1.js').then(scene => {
   // Register scene
   scene.getService('.sparklybot').registerScene(scene)

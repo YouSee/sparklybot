@@ -7,6 +7,7 @@ import uid from 'uid2'
 import kill from 'tree-kill'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
+import { deepSearch, deepSearchMultiple } from './utils/search'
 
 let websocketServer:WebSocket.Server = null
 let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
@@ -150,3 +151,41 @@ export const getSceneTreeStructure = () => sendInfoToClients({
 export const getMemoryUsage = () => sendInfoToClients({
   action: SparkBrowserActions.GET_MEMORY_USAGE,
 })
+
+export const findElementsWithPropertyValue = async (timeoutSeconds: number, property: string, value: string) => {
+  return new Promise(async (resolve, reject) => {
+    let shouldContinue = true
+    const timeout = setTimeout(() => { shouldContinue = false }, timeoutSeconds * 1000)
+    while (shouldContinue) {
+      const sceneTreeStucture = await getSceneTreeStructure()
+      // Find element with property and value
+      const scenesJson = sceneTreeStucture.sceneData.map(scene => JSON.parse(scene))
+      const result = deepSearchMultiple(scenesJson, property, (k, v) => v === value)
+      if (result && result.length) {
+        clearTimeout(timeout)
+        resolve(result)
+        break
+      }
+    }
+    resolve(null)
+  })
+}
+
+export const findFirstElementWithPropertyValue = async (timeoutSeconds: number, property: string, value: string) => {
+  return new Promise(async (resolve, reject) => {
+    let shouldContinue = true
+    const timeout = setTimeout(() => { shouldContinue = false }, timeoutSeconds * 1000)
+    while (shouldContinue) {
+      const sceneTreeStucture = await getSceneTreeStructure()
+      // Find element with property and value
+      const scenesJson = sceneTreeStucture.sceneData.map(scene => JSON.parse(scene))
+      const result = deepSearch(scenesJson, property, (k, v) => v === value)
+      if (result) {
+        clearTimeout(timeout)
+        resolve(result)
+        break
+      }
+    }
+    resolve(null)
+  })
+}
