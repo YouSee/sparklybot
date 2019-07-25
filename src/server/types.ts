@@ -19,6 +19,6 @@ export enum SparkBrowserActions {
 export interface MessagePayload {
   timeoutSeconds?: number,
   action: SparkBrowserActions,
-  payload?: string,
+  payload?: any,
 }
 

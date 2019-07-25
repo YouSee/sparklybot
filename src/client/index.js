@@ -139,7 +139,9 @@ const handleServerResponse = (scene, data, http) => {
       return
     }
     case 5: {
-      // TODO: implement keystroke
+      // Emit event
+      global.process.emit('myevent', payload)
+      sendActionFullfilled(ticketId)
       return
     }
     case 6: {
@@ -174,6 +176,9 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
       }
       return "allow"      
     })
+
+    // Try dispatching actions
+
 
     // Websocket initializer
     const startWebSocket = () => {

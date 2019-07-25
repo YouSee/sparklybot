@@ -160,7 +160,7 @@ const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: num
       const sceneTreeStucture:any = await getSceneTreeStructure()
       // Find element with property and value
       const scenesJson = sceneTreeStucture.sceneData.map((scene:any) => JSON.parse(scene))
-      const result = deepSearchMultiple(multiple, scenesJson, property, (propertyValue) => propertyValue === value)
+      const result = deepSearchMultiple(multiple, scenesJson, property, propertyValue => propertyValue === value)
       if (result) {
         clearTimeout(timeout)
         resolve(result)
@@ -176,3 +176,10 @@ export const findElementsWithPropertyValue = (property: string, value: string, t
 
 export const findElementWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): any =>
   searchSceneTreeWithPropertyValue(false, timeoutSeconds, property, value)
+
+export const setKeyEvent = (key: string) => sendInfoToClients({
+  action: SparkBrowserActions.KEYSTROKE,
+  payload: {
+    keyCode: key,
+  }
+})
