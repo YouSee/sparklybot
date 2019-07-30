@@ -6,7 +6,7 @@ import {
   closeBrowser,
   findElementWithPropertyValue,
   findElementsWithPropertyValue,
-  setKeyEvent
+  sendKeyEvent
 } from './server'
 
 // Send test event
@@ -19,10 +19,10 @@ const testSetup = async () => {
   const element = await findElementsWithPropertyValue('text', 'We are many!')
   console.log(element)
   console.log(element.length)
-  await setKeyEvent('6')
-  await setKeyEvent('7')
-  await setKeyEvent('8')
-  await setKeyEvent('9')
+  await sendKeyEvent('6')
+  await sendKeyEvent('7')
+  await sendKeyEvent('8')
+  await sendKeyEvent('9')
   console.log('actions done')
 }
 

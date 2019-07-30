@@ -177,7 +177,7 @@ export const findElementsWithPropertyValue = (property: string, value: string, t
 export const findElementWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): any =>
   searchSceneTreeWithPropertyValue(false, timeoutSeconds, property, value)
 
-export const setKeyEvent = (key: string) => sendInfoToClients({
+export const sendKeyEvent = (key: string) => sendInfoToClients({
   action: SparkBrowserActions.KEYSTROKE,
   payload: {
     keyCode: key,

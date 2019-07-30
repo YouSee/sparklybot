@@ -16,7 +16,7 @@ fs.readFile(path.resolve(__dirname, './example.js'), function(err, data) {
   // use our plugin to transform the source
   var out = babel.transformSync(src, {
     filename: 'example.js',
-    plugins: [sparkplugin]
+    plugins: [sparkplugin],
   })
   
   console.log(out.code)

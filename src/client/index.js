@@ -177,9 +177,6 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
       return "allow"      
     })
 
-    // Try dispatching actions
-
-
     // Websocket initializer
     const startWebSocket = () => {
       websocket = new Websocket(websocketUrl)

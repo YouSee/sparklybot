@@ -33,3 +33,10 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' })
     const { ws: Websocket, scene, http } = myImports
     scene.on('onClose', () => console.log('Hello got OnClose'))
   })
+
+const myOtherScope = async () => {
+  const thisScene = await px.import('px:scene.1.js')
+  thisScene.root.on('onKeyDown', function (e) {
+    console.log(`key: ${e.keyCode}`)
+  })
+}
