@@ -167,7 +167,7 @@ const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: num
       // Find element with property and value
       const scenesJson = sceneTreeStucture.sceneData.map((scene:any) => JSON.parse(scene))
       const result = deepSearchMultiple(multiple, scenesJson, property, propertyValue => propertyValue === value)
-      if (result) {
+      if ((multiple && result.length) || (!multiple && result)) {
         clearTimeout(timeout)
         resolve(result)
         break
