@@ -19,10 +19,10 @@ const testSetup = async () => {
   const element = await findElementsWithPropertyValue('text', 'We are many!')
   console.log(element)
   console.log(element.length)
-  await sendKeyEvent('6')
-  await sendKeyEvent('7')
-  await sendKeyEvent('8')
-  await sendKeyEvent('9')
+  await sendKeyEvent('onKeyDown', '6')
+  await sendKeyEvent('onKeyDown', '7')
+  await sendKeyEvent('onKeyDown', '8')
+  await sendKeyEvent('onKeyDown', '9')
   console.log('actions done')
 }
 

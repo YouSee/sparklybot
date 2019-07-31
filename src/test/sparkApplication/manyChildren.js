@@ -1,8 +1,5 @@
 // Spark application with lots of children rendered
 px.import('px:scene.1.js').then(scene => {
-  // Register scene
-  scene.getService('.sparklybot').registerScene(scene)
-
   scene.create({
     t: 'text',
     id: 'test',

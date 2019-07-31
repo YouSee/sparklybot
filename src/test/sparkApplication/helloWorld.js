@@ -1,8 +1,5 @@
 // Hello World application
 px.import('px:scene.1.js').then(scene => {
-  // Register scene
-  scene.getService('.sparklybot').registerScene(scene)
-
   scene.create({
     t: 'text',
     id: 'my-test-id',
