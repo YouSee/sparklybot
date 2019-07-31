@@ -4,7 +4,7 @@ var babel = require('@babel/core')
 var sparkplugin = require('./sparkTransformPlugin')
 
 // Method to transpile Spark application for sparklybot support
-export const transformSparkApplication = (file: string, shouldTransform: boolean) => {
+export const transformSparkApplicationFile = (file: string, shouldTransform: boolean) => {
   if (!file) throw new Error('Missing file input, cannot transpile')
   return new Promise((resolve, reject) => {
     fs.readFile(file, (err:Error, data:any) => {
@@ -23,6 +23,19 @@ export const transformSparkApplication = (file: string, shouldTransform: boolean
         if (error) reject(error)
         resolve(result.code)
       })
+    })
+  })
+}
+
+export const transformSparkCode = (basename: string, code: string) => {
+  if (!code) throw new Error('Nothing to transform')
+  return new Promise((resolve, reject) => {
+    babel.transform(code, {
+      filename: basename,
+      plugins: [sparkplugin],
+    }, (error:Error, result:any) => {
+      if (error) reject(error)
+      resolve(result.code)
     })
   })
 }

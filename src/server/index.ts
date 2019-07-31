@@ -5,10 +5,12 @@ import express from 'express'
 import WebSocket from 'ws'
 import uid from 'uid2'
 import kill from 'tree-kill'
+import request from 'request'
+import asyncRequest from 'request-promise'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
 import { deepSearchMultiple } from './utils/search'
-import { transformSparkApplication } from '../babel/transformSparkApplication'
+import { transformSparkApplicationFile, transformSparkCode } from '../babel/transformSparkApplication'
 
 let websocketServer:WebSocket.Server = null
 let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
@@ -34,10 +36,33 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
       shouldTranspileApplication = testOptions.shouldTranspileApplication
 
     // Json support
-    expressApp.use(express.json())
+    expressApp.use(express.json({limit: '50mb'}))
 
     // Serve public folder as static
     expressApp.use(express.static(path.resolve(__dirname, '../public')))
+
+    // Remote exposed spark proxy with sparklybot tranform
+    expressApp.all('/remote/:url/*', async (req, res) => {
+      const remoteUrl = req.url.substr(8)
+      const extension = path.extname(remoteUrl)
+      console.log(remoteUrl)
+      if (extension === '.js') {
+        // Transorm javascript to comply with sparklybot framework
+        try {
+          const response = await asyncRequest(remoteUrl)
+          const tranformedOutput = await transformSparkCode(path.basename(remoteUrl), response)
+          res.status(200).send(tranformedOutput)
+        } catch(e) {
+          res.status(400).send(e.message)
+        }
+      }
+      else {
+        // Proxy request
+        const remote = request(remoteUrl)
+        req.pipe(remote)
+        remote.pipe(res)
+      }
+    })
 
     // Screenshot handling => /upload
     expressApp.post('/upload', (req, res) => {
@@ -127,7 +152,18 @@ const sendInfoToClients = (messagePayload: MessagePayload) => {
 export const refreshSparkBrowser = async (sparkApplicationPath: string) => {
   // Import spark application and serve it in public folder
   if (!sparkApplicationPath) throw new Error('Missing application path')
-  let sparkApp = await transformSparkApplication(path.resolve(sparkApplicationPath), shouldTranspileApplication)
+  if (sparkApplicationPath.match(/^(https?)/)) {
+    // Remote test url
+    return new Promise((resolve, reject) => {
+      sendInfoToClients({
+        action: SparkBrowserActions.REFRESH_BROWSER,
+        payload: `http://${hostname}:${port}/remote/${sparkApplicationPath}`
+      })
+        .then(() => resolve())
+        .catch(err => reject(err))
+    })
+  }
+  let sparkApp = await transformSparkApplicationFile(path.resolve(sparkApplicationPath), shouldTranspileApplication)
   return new Promise((resolve, reject) => {
     fs.writeFile(path.resolve(__dirname, `../public/${path.basename(sparkApplicationPath)}`), sparkApp, (err) => {
       if (err) reject(err)
@@ -166,7 +202,7 @@ const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: num
       const sceneTreeStucture:any = await getSceneTreeStructure()
       // Find element with property and value
       const scenesJson = sceneTreeStucture.sceneData.map((scene:any) => JSON.parse(scene))
-      const result = deepSearchMultiple(multiple, scenesJson, property, propertyValue => propertyValue === value)
+      const result = deepSearchMultiple(multiple, Object.assign({}, scenesJson), property, propertyValue => propertyValue === value)
       if ((multiple && result.length) || (!multiple && result)) {
         clearTimeout(timeout)
         resolve(result)
