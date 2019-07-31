@@ -45,7 +45,6 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     expressApp.all('/remote/:url/*', async (req, res) => {
       const remoteUrl = req.url.substr(8)
       const extension = path.extname(remoteUrl)
-      console.log(remoteUrl)
       if (extension === '.js') {
         // Transorm javascript to comply with sparklybot framework
         try {

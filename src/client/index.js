@@ -117,7 +117,7 @@ const handleServerResponse = (scene, data, http) => {
   switch (action) {
     case 1: {
       refreshApplication(scene, payload)
-      GlobalScene.ready.then(() => sendActionFullfilled(ticketId))
+      GlobalScene.ready.then(() => setTimeout(() => sendActionFullfilled(ticketId), 500))
       return
     }
     case 2: {

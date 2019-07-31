@@ -19,9 +19,8 @@ const testSetup = async () => {
     testRegexPath: 'someRegex',
   })
   await refreshSparkBrowser('https://www.sparkui.org/examples/coverflow/coverflow_launch.js')
-  await timeout(1000)
   await findElementWithPropertyValue('text', 'Everything Is Copy - Nora Ephron: Scripted & Unscripted')
-  await takeScreenshot(path.resolve(__dirname, './myimage.png'))
+  //await takeScreenshot(path.resolve(__dirname, './myimage.png'))
   await sendKeyEvent('onKeyDown', '39')
   await findElementWithPropertyValue('text', 'The Secret Life of Pets')
   await sendKeyEvent('onKeyDown', '39')
