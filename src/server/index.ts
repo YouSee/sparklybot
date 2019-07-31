@@ -8,6 +8,7 @@ import kill from 'tree-kill'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
 import { deepSearchMultiple } from './utils/search'
+import { transformSparkApplication } from '../babel/transformSparkApplication'
 
 let websocketServer:WebSocket.Server = null
 let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
@@ -17,6 +18,7 @@ let hostname:string = null
 let websocketMessageQueue = new Map()
 let defaultTimeoutSeconds = 10
 let processId:number = null
+let shouldTranspileApplication:boolean = true
 
 export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
   // Initialize express server and websocket server
@@ -27,6 +29,9 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     const wsPort = testOptions.wsPort || 3333
 
     if (!testOptions.testRegexPath) reject('No test regex provided')
+
+    if (typeof testOptions.shouldTranspileApplication !== 'undefined')
+      shouldTranspileApplication = testOptions.shouldTranspileApplication
 
     // Json support
     expressApp.use(express.json())
@@ -119,11 +124,12 @@ const sendInfoToClients = (messagePayload: MessagePayload) => {
   })
 }
 
-export const refreshSparkBrowser = (sparkApplicationPath: string) => {
+export const refreshSparkBrowser = async (sparkApplicationPath: string) => {
   // Import spark application and serve it in public folder
-  if (!sparkApplicationPath) return
+  if (!sparkApplicationPath) throw new Error('Missing application path')
+  let sparkApp = await transformSparkApplication(path.resolve(sparkApplicationPath), shouldTranspileApplication)
   return new Promise((resolve, reject) => {
-    fs.copyFile(path.resolve(sparkApplicationPath), path.resolve(__dirname, `../public/${path.basename(sparkApplicationPath)}`), (err) => {
+    fs.writeFile(path.resolve(__dirname, `../public/${path.basename(sparkApplicationPath)}`), sparkApp, (err) => {
       if (err) reject(err)
       sendInfoToClients({
         action: SparkBrowserActions.REFRESH_BROWSER,

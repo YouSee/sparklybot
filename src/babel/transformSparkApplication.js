@@ -3,21 +3,26 @@ var path = require('path')
 var babel = require('@babel/core')
 var sparkplugin = require('./sparkTransformPlugin')
 
-// read the filename from the command line arguments
-//var fileName = process.argv[2]
+// Method to transpile Spark application for sparklybot support
+export const transformSparkApplication = (file, shouldTransform) => {
+  if (!file) throw new Error('Missing file input, cannot transpile')
+  return new Promise((resolve, reject) => {
+    fs.readFile(file, (err, data) => {
+      if(err) reject(err)
+    
+      // convert from a buffer to a string
+      var src = data.toString()
 
-// read the code from this file
-fs.readFile(path.resolve(__dirname, './example.js'), function(err, data) {
-  if(err) throw err
-
-  // convert from a buffer to a string
-  var src = data.toString()
-
-  // use our plugin to transform the source
-  var out = babel.transformSync(src, {
-    filename: 'example.js',
-    plugins: [sparkplugin],
+      if (!shouldTransform) resolve(src)
+    
+      // use our plugin to transform the source
+      babel.transform(src, {
+        filename: path.basename(file),
+        plugins: [sparkplugin],
+      }, (error, result) => {
+        if (error) reject(error)
+        resolve(result.code)
+      })
+    })
   })
-  
-  console.log(out.code)
-})
+}

@@ -5,6 +5,7 @@ export interface TestOptions {
   port?: number,
   wsPort?: number,
   hostname?: string,
+  shouldTranspileApplication?: boolean,
 }
 
 export enum SparkBrowserActions {
