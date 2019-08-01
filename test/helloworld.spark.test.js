@@ -16,13 +16,10 @@ afterEach(async () => {
 
 test('Should be able to assert on async elements', async done => {
   await refreshSparkBrowser(
-    path.resolve(__dirname, './sparkApplications/asyncElement.js'),
+    path.resolve(__dirname, './sparkApplications/helloworld.js'),
   )
-  const asyncElement = await findElementWithPropertyValue(
-    'id',
-    'my-async-element',
-  )
-  expect(asyncElement).toBeTruthy()
-  expect(asyncElement.text).toBe('2 Seconds has passed!')
+  const element = await findElementWithPropertyValue('text', 'Hello World!')
+  expect(element).toBeTruthy()
+  expect(element.id).toBe('my-test-id')
   done()
 })

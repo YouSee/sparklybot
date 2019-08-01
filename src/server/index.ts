@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
-import express from 'express'
+import express, { Express, Server } from 'express'
 import WebSocket from 'ws'
 import uid from 'uid2'
 import kill from 'tree-kill'
@@ -18,7 +18,8 @@ import {
 let websocketServer: WebSocket.Server = null
 let defaultSparkApplicationPath: string =
   '/Applications/Spark.app/Contents/MacOS/spark.sh'
-let expressApp = null
+let expressApp:Express = null
+let expressServer:Server = null
 let port: number = null
 let hostname: string = null
 let websocketMessageQueue = new Map()
@@ -90,7 +91,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
       res.send(client)
     })
 
-    expressApp.listen(port, () => {
+    expressServer = expressApp.listen(port, () => {
       console.log(`Express server listening on port ${port}`)
       // Initiate spark browser if not using remote testing
       if (!testOptions.isRemoteTesting) {
@@ -213,6 +214,19 @@ export const takeScreenshot = (path: string) =>
 
 export const closeBrowser = () => {
   if (processId) kill(processId)
+}
+
+export const stopServerAndBrowser = () => {
+  closeBrowser()
+  if (expressApp) expressApp = null
+  if (expressServer) {
+    expressServer.close()
+    expressServer = null
+  }
+  if (websocketServer) {
+    websocketServer.close()
+    websocketServer = null
+  }
 }
 
 export const getSceneTreeStructure = () =>
