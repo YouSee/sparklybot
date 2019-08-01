@@ -14,6 +14,7 @@ const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
 const scenes = []
 
+// Stringify method which handles circlular structures in spark scene objects
 Object.stringify = function(value, space) {
   let cache = []
 
@@ -58,7 +59,7 @@ const websocketSendData = data =>
     ),
   )
 
-const uploadImage = (image, http, payload, ticketId) => {
+const uploadImage = (image, http, payload) => {
   const data = JSON.stringify({
     pngImage: image,
     imagePathName: payload,
