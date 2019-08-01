@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // Hello World application
 px.import('px:scene.1.js').then(scene => {
   scene.create({

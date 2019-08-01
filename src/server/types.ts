@@ -1,11 +1,10 @@
 export interface TestOptions {
-  testRegexPath: string,
-  isRemoteTesting?: boolean,
-  sparkBrowserPath?: string,
-  port?: number,
-  wsPort?: number,
-  hostname?: string,
-  shouldTranspileApplication?: boolean,
+  isRemoteTesting?: boolean
+  sparkBrowserPath?: string
+  port?: number
+  wsPort?: number
+  hostname?: string
+  shouldTranspileApplication?: boolean
 }
 
 export enum SparkBrowserActions {
@@ -18,8 +17,7 @@ export enum SparkBrowserActions {
 }
 
 export interface MessagePayload {
-  timeoutSeconds?: number,
-  action: SparkBrowserActions,
-  payload?: any,
+  timeoutSeconds?: number
+  action: SparkBrowserActions
+  payload?: any
 }
-

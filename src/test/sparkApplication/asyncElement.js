@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // Show element async
 px.import('px:scene.1.js').then(scene => {
   // Create element after 5 seconds

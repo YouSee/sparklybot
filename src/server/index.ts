@@ -10,19 +10,23 @@ import asyncRequest from 'request-promise'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
 import { decodeBase64Image } from './utils/image'
 import { deepSearchMultiple } from './utils/search'
-import { transformSparkApplicationFile, transformSparkCode } from '../babel/transformSparkApplication'
+import {
+  transformSparkApplicationFile,
+  transformSparkCode,
+} from '../babel/transformSparkApplication'
 
-let websocketServer:WebSocket.Server = null
-let defaultSparkApplicationPath:string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
+let websocketServer: WebSocket.Server = null
+let defaultSparkApplicationPath: string =
+  '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp = null
-let port:number = null
-let hostname:string = null
+let port: number = null
+let hostname: string = null
 let websocketMessageQueue = new Map()
 let defaultTimeoutSeconds = 10
-let processId:number = null
-let shouldTranspileApplication:boolean = true
+let processId: number = null
+let shouldTranspileApplication: boolean = true
 
-export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
+export const initializeSparkTestBrowser = (testOptions?: TestOptions) => {
   // Initialize express server and websocket server
   return new Promise((resolve, reject) => {
     expressApp = express()
@@ -30,13 +34,11 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     port = testOptions.port || 3000
     const wsPort = testOptions.wsPort || 3333
 
-    if (!testOptions.testRegexPath) reject('No test regex provided')
-
     if (typeof testOptions.shouldTranspileApplication !== 'undefined')
       shouldTranspileApplication = testOptions.shouldTranspileApplication
 
     // Json support
-    expressApp.use(express.json({limit: '50mb'}))
+    expressApp.use(express.json({ limit: '50mb' }))
 
     // Serve public folder as static
     expressApp.use(express.static(path.resolve(__dirname, '../public')))
@@ -49,13 +51,15 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
         // Transorm javascript to comply with sparklybot framework
         try {
           const response = await asyncRequest(remoteUrl)
-          const tranformedOutput = await transformSparkCode(path.basename(remoteUrl), response)
+          const tranformedOutput = await transformSparkCode(
+            path.basename(remoteUrl),
+            response,
+          )
           res.status(200).send(tranformedOutput)
-        } catch(e) {
+        } catch (e) {
           res.status(400).send(e.message)
         }
-      }
-      else {
+      } else {
         // Proxy request
         const remote = request(remoteUrl)
         req.pipe(remote)
@@ -68,10 +72,10 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
       const { pngImage, imagePathName } = req.body
       const imageBuffer = decodeBase64Image(pngImage)
       console.log(`Image path name: ${imagePathName}`)
-      fs.writeFile(imagePathName, imageBuffer.data, (err) => {
+      fs.writeFile(imagePathName, imageBuffer.data, err => {
         if (err) res.status(400).send('Error saving image')
         res.status(200).send()
-      });
+      })
     })
 
     // Serve spark application
@@ -89,15 +93,20 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
     expressApp.listen(port, () => {
       console.log(`Express server listening on port ${port}`)
       // Initiate spark browser if not using remote testing
-      if (!testOptions.isRemoteTesting) {
-        exec(`${defaultSparkApplicationPath} http://localhost:${port}/automation.js`, err => { if (err) throw new Error('Failed to load spark browser')})
+      if (!testOptions.isRemoteTesting) {
+        exec(
+          `${defaultSparkApplicationPath} http://localhost:${port}/automation.js`,
+          err => {
+            if (err) throw new Error('Failed to load spark browser')
+          },
+        )
       }
     })
 
     // Setup ws server
     websocketServer = new WebSocket.Server({ port: wsPort })
 
-    websocketServer.on('connection', (ws) => {
+    websocketServer.on('connection', ws => {
       ws.on('message', (message: string) => {
         if (message) {
           const data = JSON.parse(message)
@@ -111,10 +120,12 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
             if (processId) kill(processId)
             throw new Error(data.err)
           }
-          if (!data || !data.ticketId) throw new Error('Missing ticketId from client')
+          if (!data || !data.ticketId)
+            throw new Error('Missing ticketId from client')
           // Resolve message queue
           const callbackQueueEvent = websocketMessageQueue.get(data.ticketId)
-          if (!callbackQueueEvent) throw new Error('Unknown message received from client')
+          if (!callbackQueueEvent)
+            throw new Error('Unknown message received from client')
           callbackQueueEvent.resolve(data)
         }
       })
@@ -124,7 +135,8 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions) => {
 
 // Send info to connected clients method
 const sendInfoToClients = (messagePayload: MessagePayload) => {
-  if(!websocketServer.clients.size) throw new Error('No clients connected to server')
+  if (!websocketServer.clients.size)
+    throw new Error('No clients connected to server')
 
   const timeoutSeconds = messagePayload.timeoutSeconds || defaultTimeoutSeconds
 
@@ -134,17 +146,22 @@ const sendInfoToClients = (messagePayload: MessagePayload) => {
     // Send Message
     websocketServer.clients.forEach(client => {
       if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({
-          ticketId,
-          ...messagePayload,
-        }))
+        client.send(
+          JSON.stringify({
+            ticketId,
+            ...messagePayload,
+          }),
+        )
       }
     })
 
-    setTimeout(() => reject(`Timeout has expired on action: ${messagePayload.action}`), timeoutSeconds * 1000)
+    setTimeout(
+      () => reject(`Timeout has expired on action: ${messagePayload.action}`),
+      timeoutSeconds * 1000,
+    )
 
     // Add to message queue
-    websocketMessageQueue.set(ticketId, {resolve, reject})
+    websocketMessageQueue.set(ticketId, { resolve, reject })
   })
 }
 
@@ -156,53 +173,82 @@ export const refreshSparkBrowser = async (sparkApplicationPath: string) => {
     return new Promise((resolve, reject) => {
       sendInfoToClients({
         action: SparkBrowserActions.REFRESH_BROWSER,
-        payload: `http://${hostname}:${port}/remote/${sparkApplicationPath}`
+        payload: `http://${hostname}:${port}/remote/${sparkApplicationPath}`,
       })
         .then(() => resolve())
         .catch(err => reject(err))
     })
   }
-  let sparkApp = await transformSparkApplicationFile(path.resolve(sparkApplicationPath), shouldTranspileApplication)
+  let sparkApp = await transformSparkApplicationFile(
+    path.resolve(sparkApplicationPath),
+    shouldTranspileApplication,
+  )
   return new Promise((resolve, reject) => {
-    fs.writeFile(path.resolve(__dirname, `../public/${path.basename(sparkApplicationPath)}`), sparkApp, (err) => {
-      if (err) reject(err)
-      sendInfoToClients({
-        action: SparkBrowserActions.REFRESH_BROWSER,
-        payload: `http://${hostname}:${port}/${path.basename(sparkApplicationPath)}`
-      })
-        .then(() => resolve())
-        .catch(err => reject(err))
-    })
+    fs.writeFile(
+      path.resolve(
+        __dirname,
+        `../public/${path.basename(sparkApplicationPath)}`,
+      ),
+      sparkApp,
+      err => {
+        if (err) reject(err)
+        sendInfoToClients({
+          action: SparkBrowserActions.REFRESH_BROWSER,
+          payload: `http://${hostname}:${port}/${path.basename(
+            sparkApplicationPath,
+          )}`,
+        })
+          .then(() => resolve())
+          .catch(err => reject(err))
+      },
+    )
   })
 }
 
-export const takeScreenshot = (path:string) => sendInfoToClients({
-  action: SparkBrowserActions.TAKE_SCREENSHOT,
-  payload: path,
-})
+export const takeScreenshot = (path: string) =>
+  sendInfoToClients({
+    action: SparkBrowserActions.TAKE_SCREENSHOT,
+    payload: path,
+  })
 
 export const closeBrowser = () => {
   if (processId) kill(processId)
 }
 
-export const getSceneTreeStructure = () => sendInfoToClients({
-  action: SparkBrowserActions.PRINT_SCENE_STRUCTURE,
-})
+export const getSceneTreeStructure = () =>
+  sendInfoToClients({
+    action: SparkBrowserActions.PRINT_SCENE_STRUCTURE,
+  })
 
-export const getMemoryUsage = () => sendInfoToClients({
-  action: SparkBrowserActions.GET_MEMORY_USAGE,
-})
+export const getMemoryUsage = () =>
+  sendInfoToClients({
+    action: SparkBrowserActions.GET_MEMORY_USAGE,
+  })
 
-const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: number, property: string, value: string): any => {
-  return new Promise(async (resolve) => {
+const searchSceneTreeWithPropertyValue = (
+  multiple: boolean,
+  timeoutSeconds: number,
+  property: string,
+  value: string,
+): any => {
+  return new Promise(async resolve => {
     let shouldContinue = true
-    const timeout = setTimeout(() => { shouldContinue = false }, timeoutSeconds * 1000)
+    const timeout = setTimeout(() => {
+      shouldContinue = false
+    }, timeoutSeconds * 1000)
     while (shouldContinue) {
-      const sceneTreeStucture:any = await getSceneTreeStructure()
+      const sceneTreeStucture: any = await getSceneTreeStructure()
       // Find element with property and value
-      const scenesJson = sceneTreeStucture.sceneData.map((scene:any) => JSON.parse(scene))
-      const result = deepSearchMultiple(multiple, Object.assign({}, scenesJson), property, propertyValue => propertyValue === value)
-      if ((multiple && result.length) || (!multiple && result)) {
+      const scenesJson = sceneTreeStucture.sceneData.map((scene: any) =>
+        JSON.parse(scene),
+      )
+      const result = deepSearchMultiple(
+        multiple,
+        Object.assign({}, scenesJson),
+        property,
+        propertyValue => propertyValue === value,
+      )
+      if ((multiple && result.length) || (!multiple && result)) {
         clearTimeout(timeout)
         resolve(result)
         break
@@ -212,16 +258,25 @@ const searchSceneTreeWithPropertyValue = (multiple: boolean, timeoutSeconds: num
   })
 }
 
-export const findElementsWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): Array<any> =>
+export const findElementsWithPropertyValue = (
+  property: string,
+  value: string,
+  timeoutSeconds: number = 10,
+): Array<any> =>
   searchSceneTreeWithPropertyValue(true, timeoutSeconds, property, value)
 
-export const findElementWithPropertyValue = (property: string, value: string, timeoutSeconds: number = 10): any =>
+export const findElementWithPropertyValue = (
+  property: string,
+  value: string,
+  timeoutSeconds: number = 10,
+): any =>
   searchSceneTreeWithPropertyValue(false, timeoutSeconds, property, value)
 
-export const sendKeyEvent = (eventType: string, keyCode: string) => sendInfoToClients({
-  action: SparkBrowserActions.KEYSTROKE,
-  payload: {
-    keyCode,
-    eventType,
-  }
-})
+export const sendKeyEvent = (eventType: string, keyCode: string) =>
+  sendInfoToClients({
+    action: SparkBrowserActions.KEYSTROKE,
+    payload: {
+      keyCode,
+      eventType,
+    },
+  })

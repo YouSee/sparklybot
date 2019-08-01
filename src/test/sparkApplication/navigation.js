@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 px.import('px:scene.1.js').then(scene => {
   const navigationText = scene.create({
     t: 'text',
@@ -8,7 +10,7 @@ px.import('px:scene.1.js').then(scene => {
     pixelSize: 40,
   })
 
-  scene.root.on('onKeyDown', function (e) {
+  scene.root.on('onKeyDown', function(e) {
     console.log(`key: ${e.keyCode}`)
     navigationText.text = `key: ${e.keyCode}`
   })

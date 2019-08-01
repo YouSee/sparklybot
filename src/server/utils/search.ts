@@ -1,10 +1,25 @@
-export const deepSearchMultiple = (shouldReturnMultiple: boolean = true, inputObject:Object, inputKey:string, inputPredicate:(value:any) => boolean) => {
-  let result:Array<Object> = []
+export const deepSearchMultiple = (
+  shouldReturnMultiple: boolean = true,
+  inputObject: Object,
+  inputKey: string,
+  inputPredicate: (value: any) => boolean,
+) => {
+  let result: Array<Object> = []
   if (!inputObject) return null
-  const searchDeep = (multiple: boolean, object:any, key:string, predicate: (value:any) => boolean) => {
+  const searchDeep = (
+    multiple: boolean,
+    object: any,
+    key: string,
+    predicate: (value: any) => boolean,
+  ) => {
     if (!object) return
-    if (object && typeof object === 'object' && object.hasOwnProperty(key) && predicate(object[key]) === true) {
-      const match:any = Object.assign({}, object)
+    if (
+      object &&
+      typeof object === 'object' &&
+      object.hasOwnProperty(key) &&
+      predicate(object[key]) === true
+    ) {
+      const match: any = Object.assign({}, object)
       // expose children length
       if (match.children) match.childrenLength = match.children.length
       // remove children on object
@@ -12,10 +27,15 @@ export const deepSearchMultiple = (shouldReturnMultiple: boolean = true, inputOb
       if (!multiple) return match
       result.push(match)
     }
-  
+
     for (let i = 0; i < Object.keys(object).length; i++) {
-      if (typeof object[Object.keys(object)[i]] === "object") {
-        const search:Object = searchDeep(multiple, object[Object.keys(object)[i]], key, predicate)
+      if (typeof object[Object.keys(object)[i]] === 'object') {
+        const search: Object = searchDeep(
+          multiple,
+          object[Object.keys(object)[i]],
+          key,
+          predicate,
+        )
         if (!multiple && search != null) return search
       }
     }

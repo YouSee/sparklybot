@@ -7,6 +7,6 @@ export const decodeBase64Image = (dataString: string) => {
 
   return {
     type: matches[1],
-    data: Buffer.from(matches[2], 'base64')
+    data: Buffer.from(matches[2], 'base64'),
   }
 }

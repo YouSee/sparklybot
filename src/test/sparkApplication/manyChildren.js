@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 // Spark application with lots of children rendered
 px.import('px:scene.1.js').then(scene => {
   scene.create({
@@ -20,18 +22,19 @@ px.import('px:scene.1.js').then(scene => {
   })
 
   // Add lots of children
-  let offsetX = 1
-  Array.apply(null, Array(200)).map((item, index) => scene.create({
-    t: 'text',
-    id: `textChild-${index}`,
-    x: offsetX * index,
-    y: 300,
-    parent: newNode,
-    text: 'We are many!',
-    textColor: 'yellow',
-    pixelSize: 40,
-  }))
-
+  const offsetX = 1
+  Array.apply(null, Array(200)).map((item, index) =>
+    scene.create({
+      t: 'text',
+      id: `textChild-${index}`,
+      x: offsetX * index,
+      y: 300,
+      parent: newNode,
+      text: 'We are many!',
+      textColor: 'yellow',
+      pixelSize: 40,
+    }),
+  )
 
   scene.on('onClose', () => console.log('Hello got OnClose'))
 })

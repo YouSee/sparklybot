@@ -4,9 +4,7 @@
   NOTE: px.import is specific for the Spark Browser
   https://www.sparkui.org/
 */
-/* eslint-disable no-console */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable line-comment-position */
+/* eslint-disable */
 
 // Global
 let GlobalScene = null
@@ -14,65 +12,80 @@ const websocketUrl = '$websocketurl$' // This value to be replaced by express se
 const host = '$hostname$' // This value to be replaced by express server
 const port = '$portnumber$' // This value to be replaced by express server
 let websocket = null
-let scenes = []
+const scenes = []
 
 Object.stringify = function(value, space) {
-  var cache = [];
+  let cache = []
 
-  var output = JSON.stringify(value, function (key, value) {
-
+  const output = JSON.stringify(
+    value,
+    function(key, value) {
       // filters parent on scene object to prevent circular structure
-      if(key && key.length>0 && key == "parent") {
-          return;
+      if (key && key.length > 0 && key == 'parent') {
+        return
       }
 
       if (typeof value === 'object' && value !== null) {
-          if (cache.indexOf(value) !== -1) {
-              // Circular reference found, discard key
-              return;
-          }
-          // Store value in our collection
-          cache.push(value);
+        if (cache.indexOf(value) !== -1) {
+          // Circular reference found, discard key
+          return
+        }
+        // Store value in our collection
+        cache.push(value)
       }
 
+      return value
+    },
+    space,
+  )
 
-      return value;
-  }, space)
+  cache = null // Enable garbage collection
 
-  cache = null; // Enable garbage collection
-
-  return output;
+  return output
 }
 
-const websocketSendData = data => websocket !== null && websocket.send(JSON.stringify(Object.assign({}, {
-  processId: global.process.pid,
-}, data)))
+const websocketSendData = data =>
+  websocket !== null &&
+  websocket.send(
+    JSON.stringify(
+      Object.assign(
+        {},
+        {
+          processId: global.process.pid,
+        },
+        data,
+      ),
+    ),
+  )
 
 const uploadImage = (image, http, payload, ticketId) => {
   const data = JSON.stringify({
     pngImage: image,
     imagePathName: payload,
   })
-  return new Promise(function (resolve, reject) {
-    var req = http.request({
-      host,
-      path: '/upload',
-      method: 'POST',
-      port,
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': data.length
-      }
-    }, function (res) {
-      if (res.statusCode != 200) {
-        console.log('upload failed')
-        reject('upload failed')
-        return
-      }
-      resolve()
-    })
+  return new Promise(function(resolve, reject) {
+    const req = http.request(
+      {
+        host,
+        path: '/upload',
+        method: 'POST',
+        port,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': data.length,
+        },
+      },
+      function(res) {
+        if (res.statusCode != 200) {
+          console.log('upload failed')
+          reject('upload failed')
+          return
+        }
+        resolve()
+      },
+    )
     req.on('error', function(e) {
-      reject("ERROR "+e.message)
+      reject(`ERROR ${e.message}`)
     })
     req.write(data)
     req.end()
@@ -90,7 +103,7 @@ const refreshApplication = (scene, payload) => {
       url: payload,
     })
     GlobalScene.focus = true
-    return 
+    return
   }
   GlobalScene.dispose()
   GlobalScene = scene.create({
@@ -126,22 +139,28 @@ const handleServerResponse = (scene, data, http) => {
       return
     }
     case 3: {
-      uploadImage(scene.screenshot('image/png;base64'), http, payload, ticketId)
-        .then(() => sendActionFullfilled(ticketId))
+      uploadImage(
+        scene.screenshot('image/png;base64'),
+        http,
+        payload,
+        ticketId,
+      ).then(() => sendActionFullfilled(ticketId))
       return
     }
     case 4: {
       // Print scene object
       websocketSendData({
         ticketId,
-        sceneData: scenes.length ? scenes.map(scene => {
-          try {
-            return Object.stringify(scene, null)
-          } catch (e) {
-            // Catch because sometimes stringifying a scene which is not ready will throw
-            return null
-          }
-        }) : []
+        sceneData: scenes.length
+          ? scenes.map(scene => {
+              try {
+                return Object.stringify(scene, null)
+              } catch (e) {
+                // Catch because sometimes stringifying a scene which is not ready will throw
+                return null
+              }
+            })
+          : [],
       })
       return
     }
@@ -165,7 +184,6 @@ const handleServerResponse = (scene, data, http) => {
     default: {
       console.log('Action miss!')
       sendActionFullfilled(ticketId)
-      return
     }
   }
 }
@@ -174,14 +192,13 @@ px.import({ scene: 'px:scene.1.js', ws: 'ws', http: 'http' }) // eslint-disable-
   .then(imports => {
     const { ws: Websocket, scene, http } = imports
 
-    scene.addServiceProvider((serviceName) => {                   
-      if (serviceName === ".sparklybot")
-      {
+    scene.addServiceProvider(serviceName => {
+      if (serviceName === '.sparklybot') {
         return {
-          registerScene:  (scene) => scenes.push(scene)
+          registerScene: scene => scenes.push(scene),
         }
       }
-      return "allow"      
+      return 'allow'
     })
 
     // Websocket initializer
