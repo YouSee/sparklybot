@@ -14,7 +14,7 @@
     "prepare": "npm run build",
     "release": "standard-version",
     "security": "npm audit",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest '.*[.]spark.test.js'",
     "pretest": "npm run lint"
   },
   "author": "Yousee",
@@ -42,6 +42,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.14.3",
+    "jest": "^24.8.0",
     "prettier": "^1.18.2",
     "standard-version": "^7.0.0",
     "typescript": "^3.5.3"

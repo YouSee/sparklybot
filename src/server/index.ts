@@ -26,7 +26,7 @@ let defaultTimeoutSeconds = 10
 let processId: number = null
 let shouldTranspileApplication: boolean = true
 
-export const initializeSparkTestBrowser = (testOptions?: TestOptions) => {
+export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
   // Initialize express server and websocket server
   return new Promise((resolve, reject) => {
     expressApp = express()
