@@ -117,7 +117,7 @@ const handleServerResponse = (scene, data, http) => {
   switch (action) {
     case 1: {
       refreshApplication(scene, payload)
-      GlobalScene.ready.then(() => setTimeout(() => sendActionFullfilled(ticketId), 500))
+      GlobalScene.ready.then(() => sendActionFullfilled(ticketId))
       return
     }
     case 2: {
@@ -134,7 +134,14 @@ const handleServerResponse = (scene, data, http) => {
       // Print scene object
       websocketSendData({
         ticketId,
-        sceneData: scenes.length ? scenes.map(scene => Object.stringify(scene.root, null)) : [],
+        sceneData: scenes.length ? scenes.map(scene => {
+          try {
+            return Object.stringify(scene, null)
+          } catch (e) {
+            // Catch because sometimes stringifying a scene which is not ready will throw
+            return null
+          }
+        }) : []
       })
       return
     }
