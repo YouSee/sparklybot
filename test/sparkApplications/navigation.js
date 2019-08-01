@@ -3,7 +3,7 @@
 px.import('px:scene.1.js').then(scene => {
   const navigationText = scene.create({
     t: 'text',
-    id: 'my-test-id',
+    id: 'keyboard-text-element',
     parent: scene.root,
     text: 'No keys yet!',
     textColor: 'red',

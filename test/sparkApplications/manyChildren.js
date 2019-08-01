@@ -23,7 +23,7 @@ px.import('px:scene.1.js').then(scene => {
 
   // Add lots of children
   const offsetX = 1
-  Array.apply(null, Array(200)).map((item, index) =>
+  Array.apply(null, Array(30)).map((item, index) =>
     scene.create({
       t: 'text',
       id: `textChild-${index}`,

@@ -14,7 +14,7 @@ afterEach(async () => {
   await stopServerAndBrowser()
 })
 
-test('Should be able to assert on async elements', async done => {
+test('Should be able to assert on element', async done => {
   await refreshSparkBrowser(
     path.resolve(__dirname, './sparkApplications/helloworld.js'),
   )
