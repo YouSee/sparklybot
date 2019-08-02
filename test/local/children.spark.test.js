@@ -4,7 +4,7 @@ import {
   refreshSparkBrowser,
   findElementsWithPropertyValue,
   stopServerAndBrowser,
-} from '../dist/index'
+} from '../../dist/index'
 
 beforeEach(async () => {
   await initializeSparkTestBrowser()
