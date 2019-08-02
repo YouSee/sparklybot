@@ -72,7 +72,6 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     expressApp.post('/upload', (req, res) => {
       const { pngImage, imagePathName } = req.body
       const imageBuffer = decodeBase64Image(pngImage)
-      console.log(`Image path name: ${imagePathName}`)
       fs.writeFile(imagePathName, imageBuffer.data, err => {
         if (err) res.status(400).send('Error saving image')
         res.status(200).send()
@@ -92,7 +91,6 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     })
 
     expressServer = expressApp.listen(port, () => {
-      console.log(`Express server listening on port ${port}`)
       // Initiate spark browser if not using remote testing
       if (!testOptions.isRemoteTesting) {
         exec(
@@ -114,7 +112,6 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
           if (data && data.connected && data.processId) {
             // Set current process Id
             processId = data.processId
-            console.log(`got processId: ${processId}`)
             return resolve(data.processId)
           }
           if (data && data.uncaughtException) {
