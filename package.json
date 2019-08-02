@@ -14,7 +14,8 @@
     "prepare": "npm run build",
     "release": "standard-version",
     "security": "npm audit",
-    "test": "jest '.*[.]spark.test.js' --runInBand",
+    "test": "jest './test/.*.spark.test.js' --runInBand",
+    "testRemote": "jest './remoteTesting/.*.spark.test.js' --runInBand",
     "pretest": "npm run lint"
   },
   "author": "Yousee",

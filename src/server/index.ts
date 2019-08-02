@@ -292,5 +292,5 @@ export const sendKeyEvent = (eventType: string, keyCode: string) =>
     payload: {
       keyCode,
       eventType,
-    },
+    }
   })

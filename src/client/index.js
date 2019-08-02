@@ -167,7 +167,7 @@ const handleServerResponse = (scene, data, http) => {
     }
     case 5: {
       // Emit event
-      global.process.emit(payload.eventType, { keyCode: payload.keyCode })
+      global.process.emit(payload.eventType, { keyCode: payload.keyCode, stopPropagation: () => null})
       sendActionFullfilled(ticketId)
       return
     }
