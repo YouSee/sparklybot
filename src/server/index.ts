@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import { exec } from 'child_process'
-import express, { Express, Server } from 'express'
+import express, { Express } from 'express'
 import WebSocket from 'ws'
 import uid from 'uid2'
 import kill from 'tree-kill'
@@ -19,7 +19,7 @@ let websocketServer: WebSocket.Server = null
 let defaultSparkApplicationPath: string =
   '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp:Express = null
-let expressServer:Server = null
+let expressServer:any = null
 let port: number = null
 let hostname: string = null
 let websocketMessageQueue = new Map()
