@@ -16,6 +16,7 @@
     "security": "npm audit",
     "test": "jest './test/local/.*.spark.test.js' --runInBand",
     "test:remote": "jest './test/remote/.*.spark.test.js' --runInBand",
+    "test:circleCI": "jest './test/local/.*.spark.test.js' --runInBand",
     "pretest": "npm run lint"
   },
   "author": "Yousee",
