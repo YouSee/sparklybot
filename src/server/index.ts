@@ -97,7 +97,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
         exec(
           `${sparkApplicationPath} http://localhost:${port}/automation.js`,
           err => {
-            if (err) throw new Error('Failed to load spark browser')
+            if (err) throw new Error(err.message)
           },
         )
       }
@@ -211,7 +211,9 @@ export const takeScreenshot = (path: string) =>
   })
 
 export const closeBrowser = () => {
-  if (processId) kill(processId, 'SIGKILL')
+  if (processId) kill(processId, 'SIGTERM', (err) => {
+    if(err) throw new Error(err.message)
+  })
 }
 
 export const stopServerAndBrowser = () => {
