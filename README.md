@@ -40,6 +40,7 @@ import {
   findElementWithPropertyValue,
   stopServerAndBrowser,
 } from 'sparklybot'
+
 beforeEach(async done => {
   await initializeSparkTestBrowser()
   done()
@@ -95,3 +96,19 @@ test('Wait for specific image to be displayed', async done => {
   done()
 })
 ```
+
+## Test automation on CI
+
+There's an experimental docker image ready for CI testing on dockerhub: ```docker pull renegus/spark```
+
+An example of how to use it can be found in test folder: [CircleCI config](.circleci/config.yml)
+
+Remember when running tests on CI you need to specify environment variable ```PXSCENE_PATH```
+
+## More examples
+
+Please refer to tests found in folder: [Test examples](test/)
+
+## API documentation
+
+Comming soon!
