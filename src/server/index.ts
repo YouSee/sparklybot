@@ -98,7 +98,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
         process = exec(
           `${sparkApplicationPath} http://localhost:${port}/automation.js`,
           err => {
-            if (err) throw new Error(err.message)
+            if (err) console.log(err.message)
           },
         )
       }
