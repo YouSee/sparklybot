@@ -101,7 +101,7 @@ test('Wait for specific image to be displayed', async done => {
 
 There's an experimental docker image ready for CI testing on dockerhub: ```docker pull renegus/spark```
 
-An example of how to use it can be found in test folder: [CircleCI config](.circleci/config.yml)
+An example of how to use it can be found in here: [CircleCI config](.circleci/config.yml)
 
 Remember when running tests on CI you need to specify environment variable ```PXSCENE_PATH```
 
