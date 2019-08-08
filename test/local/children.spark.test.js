@@ -7,14 +7,14 @@ import {
   stopServerAndBrowser,
 } from '../../dist/index'
 
-beforeEach(async () => {
+beforeEach(async done => {
   await initializeSparkTestBrowser(getTestOptions())
+  done()
 })
 
-afterEach(async () => {
-  await stopServerAndBrowser()
+afterEach(() => {
+  stopServerAndBrowser()
 })
-
 test('Should be able to fetch elements with same property', async done => {
   await refreshSparkBrowser(
     path.resolve(__dirname, './sparkApplications/manyChildren.js'),

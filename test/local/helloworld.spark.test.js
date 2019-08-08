@@ -7,12 +7,13 @@ import {
   stopServerAndBrowser,
 } from '../../dist/index'
 
-beforeEach(async () => {
+beforeEach(async done => {
   await initializeSparkTestBrowser(getTestOptions())
+  done()
 })
 
-afterEach(async () => {
-  await stopServerAndBrowser()
+afterEach(() => {
+  stopServerAndBrowser()
 })
 
 test('Should be able to assert on element', async done => {

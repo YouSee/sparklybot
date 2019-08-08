@@ -8,12 +8,13 @@ import {
   sendKeyEvent,
 } from '../../dist/index'
 
-beforeEach(async () => {
+beforeEach(async done => {
   await initializeSparkTestBrowser(getTestOptions())
+  done()
 })
 
-afterEach(async () => {
-  await stopServerAndBrowser()
+afterEach(() => {
+  stopServerAndBrowser()
 })
 
 const sendKeyCodeAndAssertElement = async keycode => {
