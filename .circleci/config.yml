@@ -24,14 +24,10 @@ jobs:
           name: Build project
           command: npm run build
       - run:
-          name: Setup Xvfb screen
-          command: Xvfb :0 -screen 0 1024x768x24
-          background: true
-      - run:
           name: test
           command: npm run test
           environment:
-            PXSCENE_PATH: '/usr/src/app/pxCore/examples/pxScene2d/src/spark.sh'
+            PXSCENE_PATH: 'Xvfb :0 -screen 0, 1024x768x16 /usr/src/app/pxCore/examples/pxScene2d/src/spark.sh'
 workflows:
   version: 2
   test:
