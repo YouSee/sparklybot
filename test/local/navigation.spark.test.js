@@ -13,8 +13,9 @@ beforeEach(async done => {
   done()
 })
 
-afterEach(() => {
-  stopServerAndBrowser()
+afterEach(async done => {
+  await stopServerAndBrowser()
+  done()
 })
 
 const sendKeyCodeAndAssertElement = async keycode => {

@@ -12,8 +12,9 @@ beforeEach(async done => {
   done()
 })
 
-afterEach(() => {
-  stopServerAndBrowser()
+afterEach(async done => {
+  await stopServerAndBrowser()
+  done()
 })
 
 test('Should be able to assert on element', async done => {

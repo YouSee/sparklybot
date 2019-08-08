@@ -209,11 +209,16 @@ export const takeScreenshot = (path: string) =>
   })
 
 export const closeBrowser = () => {
-  if (process) process.kill()
+  return new Promise((resolve) => {
+    if (!processId) resolve()
+    kill(processId, () => {
+      resolve()
+    })
+  })
 }
 
-export const stopServerAndBrowser = () => {
-  closeBrowser()
+export const stopServerAndBrowser = async () => {
+  await closeBrowser()
   if (expressApp) expressApp = null
   if (expressServer) {
     expressServer.close()
