@@ -36,7 +36,6 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     const wsPort = testOptions.wsPort || 3333
 
     if (testOptions.sparkBrowserPath) sparkApplicationPath = testOptions.sparkBrowserPath
-    else if (process.env.PXSCENE_PATH) sparkApplicationPath = process.env.PXSCENE_PATH
 
     if (typeof testOptions.shouldTranspileApplication !== 'undefined')
       shouldTranspileApplication = testOptions.shouldTranspileApplication
