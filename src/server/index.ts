@@ -96,10 +96,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
       // Initiate spark browser if not using remote testing
       if (!testOptions.isRemoteTesting) {
         process = exec(
-          `${sparkApplicationPath} http://localhost:${port}/automation.js`,
-          err => {
-            if (err) console.log(err.message)
-          },
+          `${sparkApplicationPath} http://localhost:${port}/automation.js`
         )
       }
     })
