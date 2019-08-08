@@ -1,5 +1,4 @@
 import path from 'path'
-import { getTestOptions } from './utils/testOptions'
 import {
   initializeSparkTestBrowser,
   refreshSparkBrowser,
@@ -8,7 +7,7 @@ import {
 } from '../../dist/index'
 
 beforeEach(async done => {
-  await initializeSparkTestBrowser(getTestOptions())
+  await initializeSparkTestBrowser()
   done()
 })
 
