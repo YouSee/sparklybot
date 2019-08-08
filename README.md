@@ -4,7 +4,7 @@ An automation framework for testing [Spark](https://www.sparkui.org/) UI Applica
 
 ## Installation
 
-Sparklybot is a set of tools which can be used together with any test framework of your choice (Jest, Ava, Mocha etc.)
+Sparklybot is a set of tools which can be used together with any test framework of your choice ([Jest](https://github.com/facebook/jest), [Ava](https://github.com/avajs/ava), [Mocha](https://github.com/mochajs/mocha) etc.)
 
 Installation is simple:
 
