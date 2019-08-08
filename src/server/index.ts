@@ -213,7 +213,6 @@ export const takeScreenshot = (path: string) =>
 
 export const closeBrowser = () => {
   if (process) process.kill()
-  if (processId) kill(processId, 'SIGTERM')
 }
 
 export const stopServerAndBrowser = () => {
