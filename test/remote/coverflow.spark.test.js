@@ -6,12 +6,14 @@ import {
   sendKeyEvent,
 } from '../../dist/index'
 
-beforeEach(async () => {
+beforeEach(async done => {
   await initializeSparkTestBrowser()
+  done()
 })
 
-afterEach(async () => {
+afterEach(async done => {
   await stopServerAndBrowser()
+  done()
 })
 
 function sleep(ms) {

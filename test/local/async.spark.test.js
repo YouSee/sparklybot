@@ -1,4 +1,5 @@
 import path from 'path'
+import { getTestOptions } from './utils/testOptions'
 import {
   initializeSparkTestBrowser,
   refreshSparkBrowser,
@@ -6,12 +7,14 @@ import {
   stopServerAndBrowser,
 } from '../../dist/index'
 
-beforeEach(async () => {
-  await initializeSparkTestBrowser()
+beforeEach(async done => {
+  await initializeSparkTestBrowser(getTestOptions())
+  done()
 })
 
-afterEach(async () => {
+afterEach(async done => {
   await stopServerAndBrowser()
+  done()
 })
 
 test('Should be able to assert on async elements', async done => {

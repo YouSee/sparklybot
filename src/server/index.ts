@@ -16,8 +16,7 @@ import {
 } from '../babel/transformSparkApplication'
 
 let websocketServer: WebSocket.Server = null
-let defaultSparkApplicationPath: string =
-  '/Applications/Spark.app/Contents/MacOS/spark.sh'
+let sparkApplicationPath: string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp:Express = null
 let expressServer:any = null
 let port: number = null
@@ -26,6 +25,7 @@ let websocketMessageQueue = new Map()
 let defaultTimeoutSeconds = 10
 let processId: number = null
 let shouldTranspileApplication: boolean = true
+let process: any = null
 
 export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
   // Initialize express server and websocket server
@@ -34,6 +34,8 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     hostname = testOptions.hostname || 'localhost'
     port = testOptions.port || 3000
     const wsPort = testOptions.wsPort || 3333
+
+    if (testOptions.sparkBrowserPath) sparkApplicationPath = testOptions.sparkBrowserPath
 
     if (typeof testOptions.shouldTranspileApplication !== 'undefined')
       shouldTranspileApplication = testOptions.shouldTranspileApplication
@@ -93,11 +95,8 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     expressServer = expressApp.listen(port, () => {
       // Initiate spark browser if not using remote testing
       if (!testOptions.isRemoteTesting) {
-        exec(
-          `${defaultSparkApplicationPath} http://localhost:${port}/automation.js`,
-          err => {
-            if (err) throw new Error('Failed to load spark browser')
-          },
+        process = exec(
+          `${sparkApplicationPath} http://localhost:${port}/automation.js`
         )
       }
     })
@@ -210,11 +209,16 @@ export const takeScreenshot = (path: string) =>
   })
 
 export const closeBrowser = () => {
-  if (processId) kill(processId)
+  return new Promise((resolve) => {
+    if (!processId) resolve()
+    kill(processId, () => {
+      resolve()
+    })
+  })
 }
 
-export const stopServerAndBrowser = () => {
-  closeBrowser()
+export const stopServerAndBrowser = async () => {
+  await closeBrowser()
   if (expressApp) expressApp = null
   if (expressServer) {
     expressServer.close()

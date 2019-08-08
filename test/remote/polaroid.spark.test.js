@@ -5,12 +5,14 @@ import {
   stopServerAndBrowser,
 } from '../../dist/index'
 
-beforeEach(async () => {
+beforeEach(async done => {
   await initializeSparkTestBrowser()
+  done()
 })
 
-afterEach(async () => {
+afterEach(async done => {
   await stopServerAndBrowser()
+  done()
 })
 
 test('Wait for specific image to be displayed', async done => {
