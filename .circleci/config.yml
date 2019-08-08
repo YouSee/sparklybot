@@ -6,8 +6,6 @@ jobs:
       - image: renegus/spark
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - restore_cache:
           keys:
             - dependency-cache-{{ checksum "package.json" }}
@@ -20,6 +18,9 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
+      - run:
+          name: Build project
+          command: npm run build
       - run:
           name: Setup Xvfb screen
           command: Xvfb :1 -screen 0 1024x768x16 &
