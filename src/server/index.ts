@@ -25,6 +25,7 @@ let websocketMessageQueue = new Map()
 let defaultTimeoutSeconds = 10
 let processId: number = null
 let shouldTranspileApplication: boolean = true
+let process: any = null
 
 export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
   // Initialize express server and websocket server
@@ -94,7 +95,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     expressServer = expressApp.listen(port, () => {
       // Initiate spark browser if not using remote testing
       if (!testOptions.isRemoteTesting) {
-        exec(
+        process = exec(
           `${sparkApplicationPath} http://localhost:${port}/automation.js`,
           err => {
             if (err) throw new Error(err.message)
@@ -211,9 +212,8 @@ export const takeScreenshot = (path: string) =>
   })
 
 export const closeBrowser = () => {
-  if (processId) kill(processId, 'SIGTERM', (err) => {
-    if(err) throw new Error(err.message)
-  })
+  if (process) process.kill()
+  if (processId) kill(processId, 'SIGTERM')
 }
 
 export const stopServerAndBrowser = () => {

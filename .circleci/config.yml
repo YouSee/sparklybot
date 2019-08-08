@@ -27,7 +27,7 @@ jobs:
           name: test
           command: npm run test
           environment:
-            PXSCENE_PATH: 'Xvfb :0 -screen 0, 1024x768x16 /usr/src/app/pxCore/examples/pxScene2d/src/spark.sh'
+            PXSCENE_PATH: "xvfb-run --auto-servernum --server-args='-screen 0, 1024x768x16' /usr/src/app/pxCore/examples/pxScene2d/src/spark.sh"
 workflows:
   version: 2
   test:
