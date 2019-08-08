@@ -2,6 +2,7 @@
   "name": "sparklybot",
   "version": "1.0.1",
   "description": "Automation framework for the Spark UI Browser",
+  "repository": "YouSee/sparklybot",
   "main": "dist/index.js",
   "scripts": {
     "prebuild": "npm run clean",
@@ -19,8 +20,19 @@
     "test:circleCI": "jest './test/local/.*.spark.test.js' --runInBand",
     "pretest": "npm run lint"
   },
+  "keywords": [
+    "rdk",
+    "spark",
+    "ui",
+    "testing",
+    "automation",
+    "ci"
+  ],
   "author": "Yousee",
   "license": "ISC",
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.5.0",
     "@babel/core": "^7.5.4",
