@@ -1,20 +1,34 @@
-import kill from 'tree-kill'
-import { takeScreenshot, processId } from '../'
+import { takeScreenshot, stopServerAndBrowser } from '../'
 
-export const killProcessAndThrowError = (error: Error) => {
-  if (processId) kill(processId)
+const imageThumbnail = (path: string) => (`
+  <a target="_blank" href="${path}">
+    <img src="${path}" style="border:2px solid #000;width:300px;">
+  </a>
+`)
+
+const screenshotError = (path: string, originalError: Error) => {
+  const error = new Error()
+  error.stack = `
+    ${originalError.stack}
+    ${imageThumbnail(path)}
+  `
+  return error
+}
+
+export const killProcessAndThrowError = async (error: Error) => {
+  await stopServerAndBrowser()
   throw error
 }
 
-export const throwErrorWithScreenshot = (error: Error) => {
+export const throwErrorWithScreenshot = async (error: Error) => {
   // Try to take screenshot if possible
-  const screenshotPath = `${__dirname}/${new Date()}.png`
+  const screenshotPath = `${process.cwd()}/test.png`
   return new Promise(resolve => {
     takeScreenshot(screenshotPath)
-      .then(() => {
-        
+      .then(async () => {
+        await killProcessAndThrowError(screenshotError(screenshotPath, error))
+        resolve()
       })
-      .catch(() => killProcessAndThrowError(error) )
   })
 
   return 

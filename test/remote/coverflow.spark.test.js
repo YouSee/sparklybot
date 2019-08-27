@@ -43,12 +43,12 @@ test('Can test remote websites', async done => {
   await sendKeyCodeWithDelay('37', 1000)
   await sendKeyCodeWithDelay('13', 1000)
   // Assert element
-  const element1 = findElementWithPropertyValue('text', 'Christine')
+  const element1 = await findElementWithPropertyValue('text', 'Christine')
   expect(element1).toBeTruthy()
   await sendKeyCodeWithDelay('39', 1000)
   await sendKeyCodeWithDelay('13', 1000)
   // Assert element
-  const element2 = findElementWithPropertyValue('text', 'Deadpool')
+  const element2 = await findElementWithPropertyValue('text', 'Deadpool')
   expect(element2).toBeTruthy()
   done()
 })
@@ -71,12 +71,12 @@ test('Can test without delay', async done => {
   await sendKeyEvent('onKeyDown', '37')
   await sendKeyEvent('onKeyDown', '13')
   // Assert element
-  const element1 = findElementWithPropertyValue('text', 'Christine')
+  const element1 = await findElementWithPropertyValue('text', 'Christine')
   expect(element1).toBeTruthy()
   await sendKeyEvent('onKeyDown', '39')
   await sendKeyEvent('onKeyDown', '13')
   // Assert element
-  const element2 = findElementWithPropertyValue('text', 'Deadpool')
+  const element2 = await findElementWithPropertyValue('text', 'Deadpool')
   expect(element2).toBeTruthy()
   done()
 })

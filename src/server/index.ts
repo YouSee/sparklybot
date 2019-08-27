@@ -8,6 +8,7 @@ import kill from 'tree-kill'
 import request from 'request'
 import asyncRequest from 'request-promise'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
+import { throwErrorWithScreenshot } from './utils/error'
 import { decodeBase64Image } from './utils/image'
 import { deepSearchMultiple } from './utils/search'
 import {
@@ -104,7 +105,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     websocketServer = new WebSocket.Server({ port: wsPort })
 
     websocketServer.on('connection', ws => {
-      ws.on('message', (message: string) => {
+      ws.on('message', async (message: string) => {
         if (message) {
           const data = JSON.parse(message)
           if (data && data.connected && data.processId) {
@@ -113,8 +114,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
             return resolve(data.processId)
           }
           if (data && data.uncaughtException) {
-            if (processId) kill(processId)
-            throw new Error(data.err)
+            await throwErrorWithScreenshot(data.err)
           }
           if (!data || !data.ticketId)
             throw new Error('Missing ticketId from client')
@@ -211,6 +211,7 @@ export const closeBrowser = () => {
   return new Promise((resolve) => {
     if (!processId) resolve()
     kill(processId, () => {
+      processId = null
       resolve()
     })
   })
@@ -265,10 +266,10 @@ const searchSceneTreeWithPropertyValue = (
       if ((multiple && result.length) || (!multiple && result)) {
         clearTimeout(timeout)
         resolve(result)
-        break
+        return
       }
     }
-    resolve(multiple ? [] : null)
+    await throwErrorWithScreenshot(new Error(`Could not find element with property: ${property}, value:${value}`))
   })
 }
 
