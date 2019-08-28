@@ -16,6 +16,7 @@ import {
   transformSparkCode,
 } from '../babel/transformSparkApplication'
 
+export const publicPath = `${process.cwd()}/results`
 let websocketServer: WebSocket.Server = null
 let sparkApplicationPath: string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp:Express = null

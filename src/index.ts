@@ -9,7 +9,8 @@ import {
   sendKeyEvent,
 } from './server'
 import {
-  toMatchImageSnapshot
+  toMatchImageSnapshot,
+  configureToMatchImageSnapshot,
 } from './jest'
 
 module.exports = {
@@ -22,4 +23,5 @@ module.exports = {
   findElementsWithPropertyValue,
   sendKeyEvent,
   toMatchImageSnapshot,
+  configureToMatchImageSnapshot,
 }
