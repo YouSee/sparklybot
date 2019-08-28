@@ -31,7 +31,7 @@ test('Should be able to assert on element', async done => {
   expect(firstScreenshot).toMatchImageSnapshot()
 
   // Key events will change fillColor of rect
-  await sendKeyEvent('onKeyDown', 'blue')
+  await sendKeyEvent('onKeyDown', 'red')
   // Screenshot match testing
   const secondScreenshot = await takeScreenshot()
   expect(secondScreenshot).toMatchImageSnapshot()
