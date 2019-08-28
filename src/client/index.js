@@ -146,7 +146,7 @@ const handleServerResponse = (scene, data, http) => {
         http,
         payload,
         ticketId,
-      ).then(() => websocketSendData({ ticketId, path: payload }))
+      ).then(() => console.log('Screenshot done!'))
       return
     }
     case 4: {

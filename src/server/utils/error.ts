@@ -1,8 +1,8 @@
 import { takeScreenshot, stopServerAndBrowser } from '../'
 
-const imageThumbnail = (path: string) => (`
+export const imageThumbnail = (path: string, width: string = '300px') => (`
   <a target="_blank" href="${path}">
-    <img src="${path}" style="border:2px solid #000;width:300px;">
+    <img src="${path}" style="border:2px solid #000;width:${width};">
   </a>
 `)
 

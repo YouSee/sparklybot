@@ -10,7 +10,7 @@ import {
 } from './server'
 import {
   toMatchImageSnapshot
-} from './jest/imageExpect'
+} from './jest'
 
 module.exports = {
   initializeSparkTestBrowser,

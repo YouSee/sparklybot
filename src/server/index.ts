@@ -72,12 +72,19 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
 
     // Screenshot handling => /upload
     expressApp.post('/upload', (req, res) => {
-      const { pngImage, imagePathName } = req.body
+      const { pngImage, imagePathName, ticketId } = req.body
       const imageBuffer = decodeBase64Image(pngImage)
-      fs.writeFile(imagePathName, imageBuffer.data, err => {
-        if (err) res.status(400).send('Error saving image')
-        res.status(200).send()
-      })
+      if (imagePathName) {
+        fs.writeFile(imagePathName, imageBuffer.data, err => {
+          if (err) res.status(400).send('Error saving image')
+          res.status(200).send()
+        })
+      }
+      // Handle ticketId callback
+      const callbackQueueEvent = websocketMessageQueue.get(ticketId)
+      if (!callbackQueueEvent)
+        throw new Error('Unknown message received from client')
+      callbackQueueEvent.resolve(imageBuffer.data)
     })
 
     // Serve spark application
@@ -201,7 +208,7 @@ export const refreshSparkBrowser = async (sparkApplicationPath: string) => {
   })
 }
 
-export const takeScreenshot = (path: string) =>
+export const takeScreenshot = (path?: string) =>
   sendInfoToClients({
     action: SparkBrowserActions.TAKE_SCREENSHOT,
     payload: path,
