@@ -6,10 +6,9 @@ const imageThumbnail = (path: string) => (`
   </a>
 `)
 
-const screenshotError = (path: string, originalError: Error) => {
-  const error = new Error()
+const screenshotError = (path: string, error: Error) => {
   error.stack = `
-    ${originalError.stack}
+    ${error.stack}
     ${imageThumbnail(path)}
   `
   return error
