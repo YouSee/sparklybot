@@ -1,5 +1,6 @@
 module.exports = {
   setupFilesAfterEnv: ['./jest.setup.js'],
+  globalTeardown: './globalTeardown.js',
   reporters: [
     'default',
     [
