@@ -17,7 +17,7 @@
     "security": "npm audit",
     "test": "jest './test/local/.*.spark.test.js' --runInBand",
     "test:remote": "jest './test/remote/.*.spark.test.js' --runInBand",
-    "test:circleCI": "jest './test/local/.*.spark.test.js' --runInBand",
+    "test:circleCI": "jest './test/local/.*.spark.test.js' --runInBand --forceExit",
     "pretest": "npm run lint"
   },
   "keywords": [

@@ -25,7 +25,7 @@ jobs:
           command: npm run build
       - run:
           name: test
-          command: npm run test
+          command: npm run test:circleCI
           environment:
             PXSCENE_PATH: "xvfb-run --auto-servernum --server-args='-screen 0, 1024x768x16' /usr/src/app/pxCore/examples/pxScene2d/src/spark.sh"
       - store_artifacts:
