@@ -24,5 +24,6 @@ test('Should be able to assert on element', async done => {
   const element = await findElementWithPropertyValue('text', 'Hello World!')
   expect(element).toBeTruthy()
   expect(element.id).toBe('my-test-id')
+  const element1 = await findElementWithPropertyValue('blaa', 'no way')
   done()
 })
