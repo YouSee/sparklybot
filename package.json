@@ -1,6 +1,6 @@
 {
   "name": "sparklybot",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Automation framework for the Spark UI Browser",
   "repository": "YouSee/sparklybot",
   "main": "dist/index.js",
