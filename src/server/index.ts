@@ -8,6 +8,7 @@ import kill from 'tree-kill'
 import request from 'request'
 import asyncRequest from 'request-promise'
 import { TestOptions, MessagePayload, SparkBrowserActions } from './types'
+import { throwErrorWithScreenshot } from './utils/error'
 import { decodeBase64Image } from './utils/image'
 import { deepSearchMultiple } from './utils/search'
 import {
@@ -15,6 +16,7 @@ import {
   transformSparkCode,
 } from '../babel/transformSparkApplication'
 
+export const publicPath = `${process.cwd()}/results`
 let websocketServer: WebSocket.Server = null
 let sparkApplicationPath: string = '/Applications/Spark.app/Contents/MacOS/spark.sh'
 let expressApp:Express = null
@@ -71,12 +73,19 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
 
     // Screenshot handling => /upload
     expressApp.post('/upload', (req, res) => {
-      const { pngImage, imagePathName } = req.body
+      const { pngImage, imagePathName, ticketId } = req.body
       const imageBuffer = decodeBase64Image(pngImage)
-      fs.writeFile(imagePathName, imageBuffer.data, err => {
-        if (err) res.status(400).send('Error saving image')
-        res.status(200).send()
-      })
+      if (imagePathName) {
+        fs.writeFile(imagePathName, imageBuffer.data, err => {
+          if (err) res.status(400).send('Error saving image')
+          res.status(200).send()
+        })
+      }
+      // Handle ticketId callback
+      const callbackQueueEvent = websocketMessageQueue.get(ticketId)
+      if (!callbackQueueEvent)
+        throw new Error('Unknown message received from client')
+      callbackQueueEvent.resolve(imageBuffer.data)
     })
 
     // Serve spark application
@@ -104,7 +113,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
     websocketServer = new WebSocket.Server({ port: wsPort })
 
     websocketServer.on('connection', ws => {
-      ws.on('message', (message: string) => {
+      ws.on('message', async (message: string) => {
         if (message) {
           const data = JSON.parse(message)
           if (data && data.connected && data.processId) {
@@ -113,8 +122,7 @@ export const initializeSparkTestBrowser = (testOptions: TestOptions = {}) => {
             return resolve(data.processId)
           }
           if (data && data.uncaughtException) {
-            if (processId) kill(processId)
-            throw new Error(data.err)
+            await throwErrorWithScreenshot(data.err)
           }
           if (!data || !data.ticketId)
             throw new Error('Missing ticketId from client')
@@ -201,7 +209,7 @@ export const refreshSparkBrowser = async (sparkApplicationPath: string) => {
   })
 }
 
-export const takeScreenshot = (path: string) =>
+export const takeScreenshot = (path?: string) =>
   sendInfoToClients({
     action: SparkBrowserActions.TAKE_SCREENSHOT,
     payload: path,
@@ -211,6 +219,7 @@ export const closeBrowser = () => {
   return new Promise((resolve) => {
     if (!processId) resolve()
     kill(processId, () => {
+      processId = null
       resolve()
     })
   })
@@ -265,10 +274,10 @@ const searchSceneTreeWithPropertyValue = (
       if ((multiple && result.length) || (!multiple && result)) {
         clearTimeout(timeout)
         resolve(result)
-        break
+        return
       }
     }
-    resolve(multiple ? [] : null)
+    await throwErrorWithScreenshot(new Error(`Could not find element with property: ${property}, value:${value}`))
   })
 }
 

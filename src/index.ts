@@ -8,6 +8,10 @@ import {
   findElementsWithPropertyValue,
   sendKeyEvent,
 } from './server'
+import {
+  toMatchImageSnapshot,
+  configureToMatchImageSnapshot,
+} from './jest'
 
 module.exports = {
   initializeSparkTestBrowser,
@@ -18,4 +22,6 @@ module.exports = {
   findElementWithPropertyValue,
   findElementsWithPropertyValue,
   sendKeyEvent,
+  toMatchImageSnapshot,
+  configureToMatchImageSnapshot,
 }

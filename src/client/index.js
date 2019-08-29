@@ -59,10 +59,11 @@ const websocketSendData = data =>
     ),
   )
 
-const uploadImage = (image, http, payload) => {
+const uploadImage = (image, http, payload, ticketId) => {
   const data = JSON.stringify({
     pngImage: image,
     imagePathName: payload,
+    ticketId,
   })
   return new Promise(function(resolve, reject) {
     const req = http.request(
@@ -145,7 +146,7 @@ const handleServerResponse = (scene, data, http) => {
         http,
         payload,
         ticketId,
-      ).then(() => sendActionFullfilled(ticketId))
+      ).then(() => console.log('Screenshot done!'))
       return
     }
     case 4: {
@@ -167,7 +168,10 @@ const handleServerResponse = (scene, data, http) => {
     }
     case 5: {
       // Emit event
-      global.process.emit(payload.eventType, { keyCode: payload.keyCode, stopPropagation: () => null})
+      global.process.emit(payload.eventType, {
+        keyCode: payload.keyCode,
+        stopPropagation: () => null,
+      })
       sendActionFullfilled(ticketId)
       return
     }

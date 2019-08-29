@@ -38,6 +38,7 @@ module.exports = {
     'fp/no-class': 'error',
   },
   settings: {
+    'import/core-modules': ['get-stdin', 'chalk'],
     'import/resolver': {
       node: {
         extensions: ['.ts', '.js'],
